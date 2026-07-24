@@ -1,0 +1,22 @@
+# ---- LUMIERE dataset (NOT redistributed — has its own license; download separately) ----
+Imaging-v202211.zip
+Radiomics-CoLlAGe-v202211.zip
+*.zip
+LUMIERE-*.csv
+LUMIERE-*.pdf
+*.nii
+*.nii.gz
+
+# ---- Python ----
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# ---- local tooling ----
+.claude/settings.local.json
+.DS_Store
