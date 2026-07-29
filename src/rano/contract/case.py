@@ -203,6 +203,11 @@ class Timepoint:
     modalities: Mapping[Modality, ImageRef]
     mask: ImageRef | None = None
     mask_source: MaskSource | None = None
+    # An image in the MASK's OWN space (e.g. the DeepBraTumIA atlas skull-strip), so the
+    # mask-alignment check compares grids that are meant to match — never mask-vs-native-FLAIR.
+    mask_reference: ImageRef | None = None
+    # Brain mask in the mask's space, for the skull-strip sanity check. May be absent.
+    brain_mask: ImageRef | None = None
 
     def has_modality(self, m: Modality) -> bool:
         return m in self.modalities
