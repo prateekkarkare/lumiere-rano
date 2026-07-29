@@ -1,0 +1,389 @@
+<title>LUMIERE Pipeline — Piece 1 Architecture (C4)</title>
+<style>
+  :root {
+    --paper: #f7f9fb; --panel: #ffffff; --ink: #0f1826; --ink-soft: #3a4a5f;
+    --muted: #647388; --line: #dde4ec; --line-soft: #eaeff4; --accent: #0891b2;
+    --accent-ink: #075e73; --pass: #16a34a; --warn: #b45309; --fail: #dc2626; --code-bg: #eef2f7;
+    /* diagram viewport — deliberately dark in BOTH themes (schematic identity) */
+    --view-bg: #080d16; --view-grid: rgba(120,150,190,0.09); --view-edge: #1a2537;
+    --node-bg: #0e1a2b; --node-ink: #dbe6f2; --node-sub: #8aa0bd; --node-edge: #22384f;
+    --wire: #56708f;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0a0f18; --panel: #0f1622; --ink: #e6edf6; --ink-soft: #b6c3d4;
+      --muted: #7f8da3; --line: #1e2a3a; --line-soft: #16202e; --accent: #22d3ee;
+      --accent-ink: #67e8f9; --pass: #34d399; --warn: #fbbf24; --fail: #fb7185; --code-bg: #0c1420;
+    }
+  }
+  :root[data-theme="light"] {
+    --paper: #f7f9fb; --panel: #ffffff; --ink: #0f1826; --ink-soft: #3a4a5f;
+    --muted: #647388; --line: #dde4ec; --line-soft: #eaeff4; --accent: #0891b2;
+    --accent-ink: #075e73; --pass: #16a34a; --warn: #b45309; --fail: #dc2626; --code-bg: #eef2f7;
+  }
+  :root[data-theme="dark"] {
+    --paper: #0a0f18; --panel: #0f1622; --ink: #e6edf6; --ink-soft: #b6c3d4;
+    --muted: #7f8da3; --line: #1e2a3a; --line-soft: #16202e; --accent: #22d3ee;
+    --accent-ink: #67e8f9; --pass: #34d399; --warn: #fbbf24; --fail: #fb7185; --code-bg: #0c1420;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans);
+    line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 3.5rem 1.5rem 5rem; }
+
+  header { border-bottom: 1px solid var(--line); padding-bottom: 2rem; margin-bottom: 2.75rem; }
+  .kicker { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--accent-ink); margin: 0 0 0.9rem; }
+  h1 { font-size: clamp(1.7rem, 4vw, 2.5rem); line-height: 1.1; margin: 0 0 0.75rem;
+    letter-spacing: -0.02em; text-wrap: balance; font-weight: 640; }
+  .lede { font-size: 1.05rem; color: var(--ink-soft); margin: 0; max-width: 62ch; }
+  .principle { margin-top: 1.6rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .rule { font-family: var(--mono); font-size: 0.78rem; color: var(--ink-soft);
+    background: var(--code-bg); border: 1px solid var(--line); border-left: 3px solid var(--accent);
+    border-radius: 4px; padding: 0.5rem 0.8rem; flex: 1 1 260px; }
+  .rule b { color: var(--ink); font-weight: 600; }
+
+  section { margin-top: 3.25rem; }
+  .lvl-head { display: flex; align-items: baseline; gap: 0.9rem; flex-wrap: wrap; margin-bottom: 0.4rem; }
+  .lvl-tag { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--paper); background: var(--accent); padding: 0.2rem 0.55rem; border-radius: 4px;
+    font-weight: 600; white-space: nowrap; }
+  h2 { font-size: 1.4rem; margin: 0; letter-spacing: -0.01em; font-weight: 620; }
+  .sub { color: var(--muted); font-size: 0.92rem; margin: 0.35rem 0 1.25rem; max-width: 68ch; }
+
+  /* ---- diagram viewport (always dark) ---- */
+  .viewport { background: var(--view-bg);
+    background-image: linear-gradient(var(--view-grid) 1px, transparent 1px),
+                      linear-gradient(90deg, var(--view-grid) 1px, transparent 1px);
+    background-size: 22px 22px; border: 1px solid var(--view-edge); border-radius: 10px;
+    padding: 1.75rem 1.25rem; overflow-x: auto; box-shadow: inset 0 0 60px rgba(0,0,0,0.45); }
+
+  /* ---- dependency-free CSS diagram primitives ---- */
+  .flow { display: flex; flex-direction: column; align-items: center; gap: 0; min-width: 460px; }
+  .row { display: flex; flex-wrap: wrap; justify-content: center; align-items: stretch; gap: 0.75rem; }
+  .node { background: var(--node-bg); border: 1px solid var(--node-edge); border-left-width: 3px;
+    border-radius: 8px; padding: 0.6rem 0.85rem; color: var(--node-ink); font-family: var(--mono);
+    font-size: 0.8rem; max-width: 240px; text-align: left; }
+  .node .t { display: block; font-weight: 600; color: #eaf1f9; letter-spacing: 0.02em; }
+  .node .s { display: block; font-size: 0.71rem; color: var(--node-sub); margin-top: 0.22rem; line-height: 1.42; }
+  .node.core { border-left-color: #22d3ee; } .node.adapter { border-left-color: #a78bfa; }
+  .node.fp { border-left-color: #fbbf24; } .node.val { border-left-color: #34d399; }
+  .node.router { border-left-color: #fb7185; }
+  .node.ext { border-left-color: #64748b; }
+  .node.future { border-left-color: #64748b; border-style: dashed; }
+  .node.future .t { color: #aeb9c9; } .node.future .s { color: #7c8aa0; }
+  .node.wide { max-width: 460px; }
+  .arrow { color: var(--wire); font-size: 1rem; line-height: 1; padding: 0.4rem 0; text-align: center; }
+  .arrow .lbl { font-family: var(--mono); font-size: 0.67rem; color: var(--node-sub); margin-left: 0.45rem; }
+  .group { border: 1px dashed #2c4258; border-radius: 10px; padding: 1.15rem 0.9rem 0.9rem;
+    position: relative; }
+  .group.solid { border-style: solid; border-color: var(--node-edge); }
+  .group > .glabel { position: absolute; top: -0.6rem; left: 0.85rem; background: var(--view-bg);
+    padding: 0 0.5rem; font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--node-sub); }
+  .branch { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; align-items: flex-start; }
+  .branch > div { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .bcap { font-family: var(--mono); font-size: 0.67rem; color: var(--node-sub); margin-bottom: 0.35rem; }
+  .bcap.ok { color: #6ee7b7; } .bcap.proc { color: #fca5b4; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem; margin-top: 0.9rem; }
+  .legend span { font-family: var(--mono); font-size: 0.74rem; color: var(--ink-soft);
+    display: inline-flex; align-items: center; gap: 0.4rem; }
+  .dot { width: 11px; height: 11px; border-radius: 3px; border: 1.5px solid; display: inline-block; }
+  .d-core { border-color: #22d3ee; background: rgba(34,211,238,0.18); }
+  .d-adapter { border-color: #a78bfa; background: rgba(167,139,250,0.18); }
+  .d-fp { border-color: #fbbf24; background: rgba(251,191,36,0.18); }
+  .d-val { border-color: #34d399; background: rgba(52,211,153,0.18); }
+  .d-router { border-color: #fb7185; background: rgba(251,113,133,0.18); }
+  .d-future { border-color: #64748b; background: transparent; border-style: dashed; }
+
+  .notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.9rem; margin-top: 1.25rem; }
+  .note { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 0.9rem 1rem; }
+  .note h4 { margin: 0 0 0.35rem; font-size: 0.82rem; font-family: var(--mono); color: var(--accent-ink); letter-spacing: 0.02em; }
+  .note p { margin: 0; font-size: 0.88rem; color: var(--ink-soft); }
+  code, .code { font-family: var(--mono); font-size: 0.86em; background: var(--code-bg); padding: 0.08em 0.35em; border-radius: 4px; }
+
+  pre.src { background: var(--view-bg); color: #cdd9e8; border: 1px solid var(--view-edge);
+    border-radius: 10px; padding: 1.25rem 1.35rem; overflow-x: auto; font-family: var(--mono);
+    font-size: 0.82rem; line-height: 1.65; margin: 0; }
+  pre.src .kw { color: #c792ea; } pre.src .ty { color: #7fd3ff; }
+  pre.src .cm { color: #5f7796; font-style: italic; } pre.src .st { color: #a9e08b; }
+  pre.src .fn { color: #ffcb6b; }
+
+  .tblwrap { overflow-x: auto; margin-top: 0.5rem; border: 1px solid var(--line); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 0.9rem; }
+  th, td { text-align: left; padding: 0.7rem 0.95rem; border-bottom: 1px solid var(--line-soft); }
+  thead th { background: var(--code-bg); font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+  tbody tr:last-child td { border-bottom: none; }
+  td code { background: transparent; padding: 0; }
+  .tag { font-family: var(--mono); font-size: 0.72rem; padding: 0.12em 0.5em; border-radius: 4px; border: 1px solid; white-space: nowrap; }
+  .t-fail { color: var(--fail); border-color: var(--fail); }
+  .t-warn { color: var(--warn); border-color: var(--warn); }
+  .t-pass { color: var(--pass); border-color: var(--pass); }
+
+  ol.steps { list-style: none; counter-reset: s; padding: 0; margin: 0.5rem 0 0; display: grid; gap: 0.65rem; }
+  ol.steps li { counter-increment: s; position: relative; padding: 0.8rem 1rem 0.8rem 3rem;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px; font-size: 0.92rem; }
+  ol.steps li::before { content: counter(s); position: absolute; left: 0.85rem; top: 0.75rem;
+    font-family: var(--mono); font-weight: 700; color: var(--accent); background: var(--code-bg);
+    border: 1px solid var(--line); width: 1.55rem; height: 1.55rem; border-radius: 6px;
+    display: grid; place-items: center; font-size: 0.82rem; }
+  ol.steps li b { color: var(--ink); } ol.steps li .m { font-family: var(--mono); font-size: 0.85em; color: var(--accent-ink); }
+  ol.steps li.done { border-left: 3px solid var(--pass); }
+  .verify { color: var(--pass); font-family: var(--mono); font-size: 0.78rem; }
+
+  footer { margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.8rem; font-family: var(--mono); }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="kicker">LUMIERE · Volumetric RANO Pipeline · Piece 1</p>
+    <h1>Data Loader &amp; Validator — Architecture</h1>
+    <p class="lede">A non-destructive <b>fingerprint + conformance</b> pass over longitudinal brain-MRI.
+      Two front doors (LUMIERE now, raw DICOM later) reduce to one internal contract; one validator reports
+      capabilities; a router decides what happens next. Modelled in C4, four levels deep.</p>
+    <div class="principle">
+      <div class="rule"><b>Rule 1 — the loader never transforms.</b> It reads, measures, and reports. Resample / skull-strip / register are separate, opt-in, logged stages downstream.</div>
+      <div class="rule"><b>Rule 2 — the validator never rejects.</b> It emits a <i>capability profile</i>; the <i>router</i> maps profile → reject · process · passthrough. Same validator serves both front doors.</div>
+    </div>
+  </header>
+
+  <!-- ============ C4 L1 ============ -->
+  <section id="l1">
+    <div class="lvl-head"><span class="lvl-tag">C4 · L1</span><h2>System Context</h2></div>
+    <p class="sub">Who and what the pipeline touches. LUMIERE is the <i>development</i> data source; a real scanner / PACS
+      is the <i>deployment</i> source. The output consumer is a neuro-radiologist reading a RANO response call.</p>
+    <div class="viewport">
+      <div class="flow">
+        <div class="row">
+          <div class="node ext"><span class="t">MRI Scanner / PACS</span><span class="s">raw DICOM · native geometry · not skull-stripped · no mask</span></div>
+          <div class="node ext"><span class="t">LUMIERE dataset</span><span class="s">preprocessed · MNI 1mm · masks + volumes shipped</span></div>
+        </div>
+        <div class="arrow">▼<span class="lbl">new study / dev cohort in</span></div>
+        <div class="row">
+          <div class="node core"><span class="t">RANO PIPELINE</span><span class="s">segment · track · assess</span></div>
+          <div class="node ext"><span class="t">DeepBraTumIA / HD-GLIO-AUTO</span><span class="s">external segmentation ⇄ invoked / emulated</span></div>
+        </div>
+        <div class="arrow">▼<span class="lbl">volumes · RANO response</span></div>
+        <div class="row"><div class="node ext"><span class="t">Neuro-radiologist</span><span class="s">reads the response call</span></div></div>
+      </div>
+    </div>
+    <div class="notes">
+      <div class="note"><h4>Two sources, one system</h4><p>LUMIERE is preprocessed so its checks <i>pass</i>; a scanner study is raw so the same checks <i>flag deficits</i> and route into processing. The system doesn't branch — the data does.</p></div>
+      <div class="note"><h4>Segmentation is external</h4><p>DeepBraTumIA is the canonical mask source. Piece 1 only <i>consumes</i> masks (LUMIERE ships them). Running/emulating segmentation is Piece 3.</p></div>
+    </div>
+  </section>
+
+  <!-- ============ C4 L2 ============ -->
+  <section id="l2">
+    <div class="lvl-head"><span class="lvl-tag">C4 · L2</span><h2>Containers</h2></div>
+    <p class="sub">The major building blocks and the flow between them. Solid = built in Piece 1. Dashed = seam or later piece.
+      Everything above the router is read-only.</p>
+    <div class="viewport">
+      <div class="flow">
+        <div class="group"><span class="glabel">Front doors · ingestion adapters</span>
+          <div class="row">
+            <div class="node adapter"><span class="t">LUMIERE zip adapter</span><span class="s">built</span></div>
+            <div class="node future"><span class="t">DICOM adapter</span><span class="s">ABC stub · later</span></div>
+          </div>
+        </div>
+        <div class="arrow">▼</div>
+        <div class="node core wide"><span class="t">INTERNAL CONTRACT</span><span class="s">Patient · Timepoint · ImageRef · lazy · per-image space tag</span></div>
+        <div class="arrow">▼</div>
+        <div class="node fp"><span class="t">FINGERPRINTER</span><span class="s">read-only stats → record</span></div>
+        <div class="arrow">▼</div>
+        <div class="node val"><span class="t">VALIDATOR</span><span class="s">checks → capability profile</span></div>
+        <div class="arrow">▼</div>
+        <div class="node router wide"><span class="t">ROUTER / POLICY</span><span class="s">reject · process · passthrough &nbsp;—&nbsp; N=1 store · N&gt;1 RANO</span></div>
+        <div class="arrow">▼</div>
+        <div class="branch">
+          <div>
+            <div class="bcap ok">usable ↓</div>
+            <div class="node val"><span class="t">VOLUMETRY</span><span class="s">thin vertical slice · built</span></div>
+          </div>
+          <div>
+            <div class="bcap proc">needs processing ↓</div>
+            <div class="group"><span class="glabel">Downstream · Pieces 2–4</span>
+              <div class="row">
+                <div class="node future"><span class="t">Skull-strip</span></div>
+                <div class="node future"><span class="t">Segmentation</span></div>
+                <div class="node future"><span class="t">Registration</span></div>
+                <div class="node future"><span class="t">RANO engine</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="legend">
+      <span><i class="dot d-core"></i>core / contract</span>
+      <span><i class="dot d-adapter"></i>adapter (front door)</span>
+      <span><i class="dot d-fp"></i>fingerprint</span>
+      <span><i class="dot d-val"></i>validate / volumetry</span>
+      <span><i class="dot d-router"></i>router / policy</span>
+      <span><i class="dot d-future"></i>seam / later piece</span>
+    </div>
+  </section>
+
+  <!-- ============ C4 L3 ============ -->
+  <section id="l3">
+    <div class="lvl-head"><span class="lvl-tag">C4 · L3</span><h2>Components — inside the Loader / Validator</h2></div>
+    <p class="sub">The Python modules of the <code>src/rano/</code> package, in dependency layers top-to-bottom.
+      <code>label_schema.py</code> and <code>config/</code> are side inputs feeding several layers.</p>
+    <div class="viewport">
+      <div class="flow">
+        <div class="row">
+          <div class="node core"><span class="t">label_schema.py</span><span class="s">project root · locked integers</span></div>
+          <div class="node core"><span class="t">config/contract.py</span><span class="s">pydantic · required mods · mask src · space</span></div>
+        </div>
+        <div class="arrow">▼<span class="lbl">imported by checks + volumetry · drives adapter + validator</span></div>
+        <div class="group solid"><span class="glabel">adapters/</span>
+          <div class="row">
+            <div class="node adapter"><span class="t">base.py</span><span class="s">Adapter / ImageRef ABC</span></div>
+            <div class="node adapter"><span class="t">lumiere/manifest.py</span><span class="s">parse datacompleteness.csv</span></div>
+            <div class="node adapter"><span class="t">lumiere/weeks.py</span><span class="s">parse + sort timepoints</span></div>
+            <div class="node adapter"><span class="t">lumiere/zip_ref.py</span><span class="s">stream NIfTI from zip</span></div>
+            <div class="node adapter"><span class="t">lumiere/adapter.py</span><span class="s">build Patient objects + audit</span></div>
+          </div>
+        </div>
+        <div class="arrow">▼</div>
+        <div class="group solid"><span class="glabel">contract/</span>
+          <div class="node core wide"><span class="t">case.py</span><span class="s">Patient · Timepoint · Geometry · Space · Modality · ImageRef · mask + mask_reference + brain_mask</span></div>
+        </div>
+        <div class="arrow">▼<span class="lbl">read-only consumers of the contract</span></div>
+        <div class="row">
+          <div class="group solid"><span class="glabel">fingerprint/</span>
+            <div class="row">
+              <div class="node fp"><span class="t">extractor.py</span><span class="s">geometry · intensity · labels</span></div>
+              <div class="node fp"><span class="t">schema.py</span><span class="s">pydantic record</span></div>
+            </div>
+          </div>
+          <div class="group solid"><span class="glabel">validate/</span>
+            <div class="row">
+              <div class="node val"><span class="t">core.py</span><span class="s">registry + runner (never raises)</span></div>
+              <div class="node val"><span class="t">checks/*</span><span class="s">1 pure fn each</span></div>
+              <div class="node val"><span class="t">profile.py</span><span class="s">CapabilityProfile · QCReport</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="arrow">▼</div>
+        <div class="node router"><span class="t">router/policy.py</span><span class="s">profile → action · N=1 vs N&gt;1</span></div>
+        <div class="arrow">▼</div>
+        <div class="node val"><span class="t">volumetry/volumes.py</span><span class="s">voxel_count × voxel_volume via label_schema</span></div>
+      </div>
+    </div>
+    <div class="notes">
+      <div class="note"><h4>label_schema.py is imported, never re-encoded</h4><p>Both the label-validity check and the volumetry slice pull region definitions from the single locked source.</p></div>
+      <div class="note"><h4>ImageRef via ABC in base.py</h4><p><code>zip_ref.py</code> is one concrete <code>ImageRef</code>; a future DICOM ref is another. The contract never knows it's a zip.</p></div>
+      <div class="note"><h4>mask_reference resolves the space trap</h4><p>The adapter wires an MNI-space reference image beside the mask, so the concordance check compares mask↔reference, never mask↔native-FLAIR.</p></div>
+    </div>
+  </section>
+
+  <!-- ============ C4 L4 ============ -->
+  <section id="l4">
+    <div class="lvl-head"><span class="lvl-tag">C4 · L4</span><h2>Code — the contract types &amp; the check signature</h2></div>
+    <p class="sub">The shapes that harden first. <code>Geometry</code> reads from the NIfTI header only (no full-array load), so
+      fingerprinting stays lazy. Space lives on each <code>ImageRef</code> — the reason the mask-alignment check compares the
+      MNI mask against its MNI reference, never native FLAIR.</p>
+    <pre class="src"><span class="cm"># contract/case.py — frozen dataclasses (pydantic stays at the edges)</span>
+<span class="kw">class</span> <span class="ty">SpaceTag</span>(Enum):  NATIVE, MNI152_1MM   <span class="cm"># Space(tag, key): two NATIVE keys ≠ co-registered</span>
+<span class="kw">class</span> <span class="ty">Modality</span>(Enum): CT1, T1, T2, FLAIR
+
+<span class="kw">@dataclass(frozen=True)</span>
+<span class="kw">class</span> <span class="ty">Geometry</span>:                         <span class="cm"># all header-only — no voxels loaded</span>
+    shape; spacing; orientation; dtype    <span class="cm"># orientation = nib.aff2axcodes(affine)</span>
+    anisotropy_ratio; affine              <span class="cm"># affine excluded from eq/hash (stays hashable)</span>
+
+<span class="kw">class</span> <span class="ty">ImageRef</span>(ABC):                      <span class="cm"># a LAZY handle, not the array</span>
+    geometry  -> <span class="ty">Geometry</span>              <span class="cm"># cheap: header only</span>
+    space     -> <span class="ty">Space</span>
+    source    -> str                      <span class="cm"># provenance</span>
+    <span class="kw">def</span> <span class="fn">load</span>(self) -> <span class="ty">LoadedImage</span>       <span class="cm"># data + affine + header, on demand</span>
+
+<span class="kw">@dataclass(frozen=True, eq=False)</span>
+<span class="kw">class</span> <span class="ty">Timepoint</span>:
+    id; label; week_offset
+    modalities: dict[<span class="ty">Modality</span>, <span class="ty">ImageRef</span>]     <span class="cm"># raw sequences, native space</span>
+    mask; mask_source                            <span class="cm"># DeepBraTumIA mask, MNI</span>
+    mask_reference; brain_mask                    <span class="cm"># MNI images in the mask's own space</span>
+
+<span class="kw">@dataclass(frozen=True, eq=False)</span>
+<span class="kw">class</span> <span class="ty">Patient</span>:
+    id; timepoints: tuple[<span class="ty">Timepoint</span>, ...]   <span class="cm"># __post_init__ asserts chronological order</span>
+
+<span class="cm"># validate/core.py — every check is a pure function; the runner wraps it so</span>
+<span class="cm"># an exception becomes a FAIL (loader cannot crash on a bad case).</span>
+<span class="ty">Check</span> = Callable[[<span class="ty">CaseView</span>, <span class="ty">Contract</span>], <span class="ty">CheckResult</span>]
+<span class="kw">class</span> <span class="ty">CheckResult</span>: status: <span class="st">"pass"|"warn"|"fail"</span>; code; detail; evidence</pre>
+  </section>
+
+  <!-- ============ cross-cutting: two front doors ============ -->
+  <section id="doors">
+    <div class="lvl-head"><span class="lvl-tag">KEY IDEA</span><h2>One validator, two verdicts</h2></div>
+    <p class="sub">Why the capability-profile design pays off: the identical check yields opposite — and both correct —
+      verdicts depending on the front door. The <i>router</i>, not the validator, decides what that means.</p>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>Check</th><th>LUMIERE case</th><th>Raw DICOM case</th></tr></thead>
+        <tbody>
+          <tr><td>canonical mask present</td><td><span class="tag t-pass">pass</span> → volumetry</td><td><span class="tag t-fail">absent</span> → route to <b>segmentation</b></td></tr>
+          <tr><td>skull-stripped</td><td><span class="tag t-pass">pass</span></td><td><span class="tag t-fail">no</span> → route to <b>skull-strip</b></td></tr>
+          <tr><td>modalities in one space</td><td><span class="tag t-warn">differ</span> (native vs MNI)</td><td><span class="tag t-warn">differ</span> → route to <b>registration</b></td></tr>
+          <tr><td>required modality present</td><td><span class="tag t-pass">pass</span></td><td><span class="tag t-pass">pass</span> — or genuinely <b>unusable</b></td></tr>
+          <tr><td>mask labels ⊆ schema</td><td><span class="tag t-pass">pass</span></td><td>n/a (no mask yet)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="notes">
+      <div class="note"><h4>The trap this avoids</h4><p>If the validator hardcoded “no mask = unusable”, it could never serve the deployment door. Deficits are data, not rejections.</p></div>
+      <div class="note"><h4>Single vs multi is the router's job</h4><p><code>N == 1</code> → segment + store. <code>N &gt; 1</code> → segment + RANO. So the baseline / orderability check only fires when <code>N &gt; 1</code>.</p></div>
+      <div class="note"><h4>Space-aware alignment</h4><p>The mask-grid check compares the mask to the image <i>in the mask's space</i> (<code>mask_reference</code>), not native FLAIR — else every LUMIERE case falsely reads "misaligned".</p></div>
+    </div>
+  </section>
+
+  <!-- ============ checks catalogue ============ -->
+  <section id="checks">
+    <div class="lvl-head"><span class="lvl-tag">VALIDATOR</span><h2>Check catalogue</h2></div>
+    <p class="sub">Each row is one pure function in <code>validate/checks/</code>, registered with a configurable severity.
+      Absent compartment = 0&nbsp;mm³, never an error. Anisotropy is flagged, never rejected.</p>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>Check</th><th>What it asserts</th><th>Default severity</th></tr></thead>
+        <tbody>
+          <tr><td><code>modalities_present</code></td><td>required set (CT1 + FLAIR) exists; T1/T2 desired</td><td><span class="tag t-fail">fail</span> / <span class="tag t-warn">warn</span></td></tr>
+          <tr><td><code>geometry_consistency</code></td><td>modalities of a timepoint share a grid — or record they differ</td><td><span class="tag t-warn">warn</span></td></tr>
+          <tr><td><code>anisotropy</code></td><td>report spacing + anisotropy ratio</td><td><span class="tag t-warn">warn</span> (never fail)</td></tr>
+          <tr><td><code>mask_grid_alignment</code></td><td>mask shares affine + shape of its <code>mask_reference</code> (same space)</td><td><span class="tag t-fail">fail</span></td></tr>
+          <tr><td><code>label_schema_validity</code></td><td>unique mask integers ⊆ documented set</td><td><span class="tag t-fail">fail</span></td></tr>
+          <tr><td><code>skull_strip_sanity</code></td><td>non-brain background zeroed / brain mask present</td><td><span class="tag t-warn">warn</span></td></tr>
+          <tr><td><code>longitudinal_orderability</code></td><td>timepoints parse + sort; baseline identifiable <i>(N&gt;1 only)</i></td><td><span class="tag t-warn">warn</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ build order ============ -->
+  <section id="build">
+    <div class="lvl-head"><span class="lvl-tag">SEQUENCE</span><h2>Build order — small reviewable steps</h2></div>
+    <p class="sub">Numbered because it is a real dependency chain. Steps&nbsp;2 and&nbsp;6 are where we <i>verify against the data</i>
+      rather than assert. ✓ = done and verified.</p>
+    <ol class="steps">
+      <li class="done"><b>✓ Contract + adapter ABCs</b> — <span class="m">contract/case.py · adapters/base.py</span>. Interfaces only; seam smoke-tested.</li>
+      <li class="done"><b>✓ LUMIERE adapter</b> — <span class="m">manifest → weeks → zip_ref → adapter</span>. <span class="verify">verified: 91 patients / 638 timepoints reconcile with the manifest; ImageRef streams real data.</span></li>
+      <li><b>Fingerprinter</b> — <span class="m">fingerprint/</span> per-patient record: geometry, spacing, orientation, mask-space, intensity stats, label histograms.</li>
+      <li><b>Validator</b> — <span class="m">validate/</span> checks + CapabilityProfile; runner never raises. Includes the mask↔reference concordance flag.</li>
+      <li><b>Router / policy</b> — <span class="m">router/policy.py</span> bucket usable / needs-attention / unusable + N=1 vs N&gt;1 branch.</li>
+      <li><b>Volumetry slice</b> — <span class="m">volumetry/volumes.py</span>. <span class="verify">verify: reproduce shipped enhancing/edema mm³ for ≥1 patient within rounding.</span></li>
+      <li><b>Tests</b> — synthetic bad cases: missing modality · misaligned mask · off-schema label.</li>
+      <li><b>Cohort run + “what surprised us” note</b> — which timepoints fail which check, and how many.</li>
+    </ol>
+  </section>
+
+  <footer>
+    LUMIERE volumetric-RANO · Piece 1 reference · C4 model (Context → Container → Component → Code) ·
+    loader = fingerprint + conformance, never transforms · diagrams are dependency-free HTML/CSS.
+  </footer>
+</div>

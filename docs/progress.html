@@ -1,0 +1,272 @@
+<title>LUMIERE Piece 1 — Progress Report</title>
+<style>
+  :root {
+    --paper: #f7f9fb; --panel: #ffffff; --ink: #0f1826; --ink-soft: #3a4a5f;
+    --muted: #647388; --line: #dde4ec; --line-soft: #eaeff4; --accent: #0891b2;
+    --accent-ink: #075e73; --pass: #16a34a; --warn: #b45309; --fail: #dc2626; --code-bg: #eef2f7;
+    --view-bg: #080d16; --view-grid: rgba(120,150,190,0.09); --view-edge: #1a2537;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0a0f18; --panel: #0f1622; --ink: #e6edf6; --ink-soft: #b6c3d4;
+      --muted: #7f8da3; --line: #1e2a3a; --line-soft: #16202e; --accent: #22d3ee;
+      --accent-ink: #67e8f9; --pass: #34d399; --warn: #fbbf24; --fail: #fb7185; --code-bg: #0c1420;
+    }
+  }
+  :root[data-theme="light"] {
+    --paper: #f7f9fb; --panel: #ffffff; --ink: #0f1826; --ink-soft: #3a4a5f;
+    --muted: #647388; --line: #dde4ec; --line-soft: #eaeff4; --accent: #0891b2;
+    --accent-ink: #075e73; --pass: #16a34a; --warn: #b45309; --fail: #dc2626; --code-bg: #eef2f7;
+  }
+  :root[data-theme="dark"] {
+    --paper: #0a0f18; --panel: #0f1622; --ink: #e6edf6; --ink-soft: #b6c3d4;
+    --muted: #7f8da3; --line: #1e2a3a; --line-soft: #16202e; --accent: #22d3ee;
+    --accent-ink: #67e8f9; --pass: #34d399; --warn: #fbbf24; --fail: #fb7185; --code-bg: #0c1420;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans);
+    line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 3.25rem 1.5rem 5rem; }
+
+  header { border-bottom: 1px solid var(--line); padding-bottom: 1.75rem; margin-bottom: 2.5rem; }
+  .kicker { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--accent-ink); margin: 0 0 0.85rem; }
+  h1 { font-size: clamp(1.6rem, 3.6vw, 2.25rem); line-height: 1.12; margin: 0 0 0.6rem;
+    letter-spacing: -0.02em; text-wrap: balance; font-weight: 640; }
+  .lede { font-size: 1.02rem; color: var(--ink-soft); margin: 0 0 1.4rem; max-width: 66ch; }
+  .related { font-family: var(--mono); font-size: 0.78rem; color: var(--muted); }
+  .related a { color: var(--accent-ink); }
+
+  /* progress strip */
+  .track { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+  .chip { font-family: var(--mono); font-size: 0.72rem; padding: 0.32rem 0.7rem; border-radius: 999px;
+    border: 1px solid; display: inline-flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
+  .chip .n { font-weight: 700; }
+  .chip.done { color: var(--pass); border-color: var(--pass); background: color-mix(in srgb, var(--pass) 10%, transparent); }
+  .chip.wip { color: var(--warn); border-color: var(--warn); background: color-mix(in srgb, var(--warn) 10%, transparent); }
+  .chip.pending { color: var(--muted); border-color: var(--line); border-style: dashed; }
+
+  section { margin-top: 2.75rem; }
+  .lvl-head { display: flex; align-items: baseline; gap: 0.9rem; flex-wrap: wrap; margin-bottom: 0.4rem; }
+  .lvl-tag { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--paper); background: var(--accent); padding: 0.2rem 0.55rem; border-radius: 4px;
+    font-weight: 600; white-space: nowrap; }
+  h2 { font-size: 1.28rem; margin: 0; letter-spacing: -0.01em; font-weight: 620; }
+  .sub { color: var(--muted); font-size: 0.9rem; margin: 0.35rem 0 1.1rem; max-width: 68ch; }
+
+  /* component cards */
+  .comp { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--accent);
+    border-radius: 8px; padding: 1rem 1.15rem; margin-bottom: 0.85rem; }
+  .comp h3 { margin: 0 0 0.3rem; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+  .comp h3 .status { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 0.1rem 0.45rem; border-radius: 4px; }
+  .comp h3 .status.done { color: var(--pass); background: color-mix(in srgb, var(--pass) 14%, transparent); }
+  .comp p { margin: 0.3rem 0; color: var(--ink-soft); font-size: 0.92rem; }
+  .comp .files { font-family: var(--mono); font-size: 0.78rem; color: var(--accent-ink); margin-top: 0.5rem; }
+  .comp .verified { margin-top: 0.55rem; padding-top: 0.55rem; border-top: 1px dashed var(--line); font-size: 0.85rem; }
+  .comp .verified b { color: var(--pass); font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .viewport { background: var(--view-bg);
+    background-image: linear-gradient(var(--view-grid) 1px, transparent 1px),
+                      linear-gradient(90deg, var(--view-grid) 1px, transparent 1px);
+    background-size: 22px 22px; border: 1px solid var(--view-edge); border-radius: 10px;
+    padding: 1.1rem 1.25rem; overflow-x: auto; box-shadow: inset 0 0 60px rgba(0,0,0,0.45); }
+  .viewport pre { margin: 0; font-family: var(--mono); font-size: 0.8rem; color: #cdd9e8; line-height: 1.6; }
+  .viewport .dim { color: #5f7796; }
+  .viewport .hi { color: #7fd3ff; }
+  .viewport .go { color: #a9e08b; }
+
+  .tblwrap { overflow-x: auto; margin-top: 0.5rem; border: 1px solid var(--line); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; min-width: 520px; font-size: 0.88rem; }
+  th, td { text-align: left; padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  thead th { background: var(--code-bg); font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.05em;
+    text-transform: uppercase; color: var(--muted); }
+  tbody tr:last-child td { border-bottom: none; }
+  td code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); padding: 0.08em 0.35em; border-radius: 4px; }
+  .num { font-variant-numeric: tabular-nums; font-family: var(--mono); }
+  .v-ok { color: var(--pass); font-weight: 600; }
+  .v-flag { color: var(--warn); font-weight: 600; }
+
+  ol.steps { list-style: none; counter-reset: s; padding: 0; margin: 0.5rem 0 0; display: grid; gap: 0.55rem; }
+  ol.steps li { counter-increment: s; position: relative; padding: 0.7rem 1rem 0.7rem 3rem;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px; font-size: 0.9rem; }
+  ol.steps li::before { content: counter(s); position: absolute; left: 0.8rem; top: 0.68rem;
+    font-family: var(--mono); font-weight: 700; color: var(--accent); background: var(--code-bg);
+    border: 1px solid var(--line); width: 1.5rem; height: 1.5rem; border-radius: 6px;
+    display: grid; place-items: center; font-size: 0.8rem; }
+  ol.steps li.done { border-left: 3px solid var(--pass); }
+  ol.steps li.done::before { color: var(--pass); content: "✓"; }
+  ol.steps li.wip { border-left: 3px solid var(--warn); }
+  ol.steps li.wip::before { color: var(--warn); }
+  ol.steps li b { color: var(--ink); }
+  ol.steps li .m { font-family: var(--mono); font-size: 0.84em; color: var(--accent-ink); }
+  ol.steps li .note { display: block; margin-top: 0.25rem; color: var(--muted); font-size: 0.85em; }
+
+  .notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 0.85rem; margin-top: 1rem; }
+  .note { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 0.85rem 1rem; }
+  .note h4 { margin: 0 0 0.3rem; font-size: 0.8rem; font-family: var(--mono); color: var(--accent-ink); }
+  .note p { margin: 0; font-size: 0.86rem; color: var(--ink-soft); }
+
+  footer { margin-top: 3.5rem; padding-top: 1.4rem; border-top: 1px solid var(--line); color: var(--muted);
+    font-size: 0.78rem; font-family: var(--mono); }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="kicker">LUMIERE · Volumetric RANO Pipeline · Piece 1</p>
+    <h1>Progress Report — Data Loader &amp; Validator</h1>
+    <p class="lede">Where Piece 1 actually stands: what's built, what's verified against the real
+      31,370-member archive (not assumed), and what's still ahead. Companion to the
+      <span class="related">architecture map (C4) — ask to reopen it if you don't have the link handy.</span></p>
+    <div class="track">
+      <span class="chip done"><span class="n">1</span> Contract + adapter ABCs</span>
+      <span class="chip done"><span class="n">2</span> LUMIERE adapter</span>
+      <span class="chip wip"><span class="n">3</span> Fingerprinter</span>
+      <span class="chip pending"><span class="n">4</span> Validator</span>
+      <span class="chip pending"><span class="n">5</span> Router</span>
+      <span class="chip pending"><span class="n">6</span> Volumetry</span>
+      <span class="chip pending"><span class="n">7</span> Tests (synthetic)</span>
+      <span class="chip pending"><span class="n">8</span> Cohort QC note</span>
+    </div>
+  </header>
+
+  <!-- ============ what's built ============ -->
+  <section>
+    <div class="lvl-head"><span class="lvl-tag">Built</span><h2>Components shipped so far</h2></div>
+    <p class="sub">Three pieces, each committed and independently verified against the real dataset —
+      not sample data, not assumptions.</p>
+
+    <div class="comp">
+      <h3>Contract + Adapter Seam <span class="status done">done</span></h3>
+      <p>The internal representation every ingestion front-door reduces to: <code>Patient</code>,
+        <code>Timepoint</code>, <code>ImageRef</code> (lazy, header-only geometry), <code>Space</code>
+        (per-image, not per-timepoint). The <code>Adapter</code> ABC is the two-front-door contract —
+        proven by a real second subclass (<code>DicomAdapter</code>), not just an interface on paper.</p>
+      <p class="files">src/rano/contract/case.py · src/rano/adapters/base.py · adapters/dicom.py</p>
+      <div class="verified"><b>Verified</b> — a no-data smoke test exercises every type end-to-end:
+        <code>Geometry.from_header</code> derives spacing/orientation/anisotropy correctly on both an
+        isotropic and a thick-slice synthetic case; a fake <code>ImageRef</code> proves the ABC is
+        satisfiable; <code>Patient.__post_init__</code> rejects out-of-order timepoints;
+        <code>DicomAdapter</code> is a real <code>Adapter</code> subclass whose stub methods raise
+        <code>NotImplementedError</code> as designed.</div>
+    </div>
+
+    <div class="comp">
+      <h3>LUMIERE Adapter <span class="status done">done</span></h3>
+      <p>Resolves <code>LUMIERE-datacompleteness.csv</code> (the ground-truth manifest) + the 32.6&nbsp;GB
+        imaging zip into lazy <code>Patient</code> objects — streamed via <code>zipfile</code>, no
+        extraction. Wires the mask plus an MNI-space <code>mask_reference</code> and <code>brain_mask</code>
+        beside it, so later alignment checks compare grids that are actually meant to match.</p>
+      <p class="files">src/rano/adapters/lumiere/{paths,weeks,zip_ref,adapter}.py</p>
+      <div class="verified"><b>Verified against the real archive</b> —
+        <table style="margin-top:0.4rem"><tbody>
+          <tr><td style="padding:0.2rem 0">Patient / timepoint counts</td><td class="num v-ok">91 / 638 — exact match with manifest</td></tr>
+          <tr><td style="padding:0.2rem 0">(patient, timepoint) set identity</td><td class="v-ok">identical, 0 extra either side</td></tr>
+          <tr><td style="padding:0.2rem 0">Chronological ordering</td><td class="v-ok">held for all 91 patients</td></tr>
+          <tr><td style="padding:0.2rem 0">ImageRef streams real voxels</td><td>header-only geometry ~8ms; full mask <code>load()</code> ~2ms; labels read back <code>[0,1,2,3]</code></td></tr>
+          <tr><td style="padding:0.2rem 0">Manifest ↔ zip audit</td><td class="v-flag">40 discrepancies = 8 fully-empty timepoints, all Patient-025 (see below)</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <div class="comp">
+      <h3>Atlas-Space Consistency Fingerprint <span class="status done">done</span> <span style="font-size:0.75rem;color:var(--muted);font-weight:400">— seed of step 3</span></h3>
+      <p>A pure, read-only, adapter-agnostic check: does every DeepBraTumIA atlas-space image (mask +
+        reference + brain mask) across the whole cohort actually share one grid? This is the real
+        failure mode a "canonical mask" claim could hide — not whether the label is externally correct.</p>
+      <p class="files">src/rano/fingerprint/atlas_consistency.py</p>
+      <div class="verified"><b>Verified</b> — <span class="num">1,773 / 1,773</span> MNI-tagged images
+        across all 91 patients share an identical affine + shape <code>(182, 218, 182)</code>, to
+        floating-point precision. Zero outliers.</div>
+    </div>
+  </section>
+
+  <!-- ============ verified facts ============ -->
+  <section>
+    <div class="lvl-head"><span class="lvl-tag">Evidence</span><h2>What the real data told us</h2></div>
+    <p class="sub">Every row below was measured against the actual archive this session, not assumed.</p>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>Finding</th><th>Detail</th></tr></thead>
+        <tbody>
+          <tr><td>Cohort size</td><td class="num">91 patients, 638 timepoints — all reconcile exactly with the manifest</td></tr>
+          <tr><td>Every patient is longitudinal</td><td><b>0</b> single-timepoint patients in LUMIERE — the router's N=1 "segment+store" branch has no LUMIERE case to exercise; will need a synthetic one</td></tr>
+          <tr><td>Native geometry is extremely anisotropic</td><td>Patient-001 FLAIR: <span class="num">640×640×40</span> @ <span class="num">0.36×0.36×4.4mm</span> → <span class="num v-flag">12.24×</span> anisotropy ratio — concrete proof isotropy-gating in the loader would reject good data</td></tr>
+          <tr><td>Patient-025 label mismatch</td><td>Manifest lists weeks 006/008/025/036/049/061/065/076; the zip actually holds this patient under weeks 000/001/019/030/043/055/059/070 — same count (8), <em>different labels</em>. Data is NOT missing, just unreachable under manifest-authoritative loading. <b>Decision:</b> keep manifest-authoritative, flag as unusable, don't reconcile.</td></tr>
+          <tr><td>Atlas space is cohort-consistent</td><td><span class="num v-ok">1,773 / 1,773</span> images share one grid — origin <span class="num">(90, −126, −72)</span>, 1mm diagonal (matches the well-known FSL MNI152_T1_1mm signature, noted in passing, not depended upon)</td></tr>
+          <tr><td>Mask labels match schema</td><td>Real DeepBraTumIA mask read back unique values <span class="num">[0,1,2,3]</span> — consistent with <code>label_schema.py</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ decisions ============ -->
+  <section>
+    <div class="lvl-head"><span class="lvl-tag">Locked</span><h2>Architectural decisions made this piece</h2></div>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>Decision</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>Validator emits a <b>capability profile</b>, not usable/unusable</td><td>A router maps profile → action, so the same validator serves LUMIERE (mask absent = failure) and a future raw-DICOM door (mask absent = expected, routes to segmentation)</td></tr>
+          <tr><td>Adapter seam built now; only LUMIERE implemented</td><td><code>DicomAdapter</code> exists as a real ABC subclass (stubbed) so the two-door design is proven, not asserted</td></tr>
+          <tr><td>Adapter = format-decode only, never processing</td><td>Resample/skull-strip/register/segment stay explicit downstream stages — the loader never transforms pixels</td></tr>
+          <tr><td>Space lives per-image, not per-timepoint</td><td>LUMIERE masks are MNI, raw sequences are native — comparing them directly would falsely flag every case as misaligned</td></tr>
+          <tr><td>Single vs multi-timepoint is the <b>router's</b> job</td><td>N=1 → segment+store, N&gt;1 → segment+RANO; the loader/validator stay agnostic to it</td></tr>
+          <tr><td>Patient-025: manifest-authoritative + flag</td><td>Rather than build fragile zip-reconciliation for an 8↔8 label mismatch that can't be safely auto-mapped</td></tr>
+          <tr><td>External MNI152 identity verification: dropped</td><td>Nothing downstream ever computes against an external reference template — only cohort-internal consistency protects a real failure mode, so that's the only check built</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ repo state ============ -->
+  <section>
+    <div class="lvl-head"><span class="lvl-tag">Repo</span><h2>Current state on disk</h2></div>
+    <div class="viewport">
+      <pre><span class="dim"># src/rano/ — package "rano", editable-installed, Python 3.14.4</span>
+<span class="hi">contract/</span>
+  case.py             <span class="dim">Modality · MaskSource · SpaceTag · Space · Geometry · ImageRef · Timepoint · Patient</span>
+<span class="hi">adapters/</span>
+  base.py             <span class="dim">Adapter ABC</span>
+  dicom.py            <span class="dim">DicomAdapter — real subclass, stubbed (seam proof)</span>
+  lumiere/
+    paths.py          <span class="dim">verified zip member-path builders</span>
+    weeks.py          <span class="dim">week-NNN[-M] parse + chronological sort</span>
+    zip_ref.py         <span class="dim">ZipSource, ZipNiftiRef — lazy streaming NIfTI</span>
+    adapter.py         <span class="dim">LumiereAdapter + audit_manifest_vs_zip</span>
+<span class="hi">fingerprint/</span>
+  atlas_consistency.py <span class="dim">check_atlas_consistency — cohort grid check</span>
+
+<span class="go">tests/  — 42 passed in 0.05s</span>  <span class="dim">(conftest + 6 test modules, no dependency on the 32GB zip)</span>
+
+<span class="dim"># git — personal identity confirmed (prateek.karkare@gmail.com)</span>
+9442821  Piece 1 (step 2): LUMIERE adapter + atlas-space consistency fingerprint
+6262ad0  Piece 1 (step 1): case contract + ingestion adapter seam
+<span class="dim">   branch ahead of origin/master by 1 commit — not pushed</span></pre>
+    </div>
+  </section>
+
+  <!-- ============ remaining ============ -->
+  <section>
+    <div class="lvl-head"><span class="lvl-tag">Ahead</span><h2>What's not built yet</h2></div>
+    <ol class="steps">
+      <li class="done"><b>Contract + adapter ABCs</b> <span class="m">contract/ · adapters/base.py</span></li>
+      <li class="done"><b>LUMIERE adapter</b> <span class="m">adapters/lumiere/</span></li>
+      <li class="wip"><b>Fingerprinter</b> <span class="m">fingerprint/</span><span class="note">Atlas-consistency slice done. Still needed: per-patient geometry/intensity/label-histogram record; full cohort aggregation (the nnU-Net-pattern part beyond this one check).</span></li>
+      <li><b>Validator</b> <span class="m">validate/</span><span class="note">Checks + CapabilityProfile; runner that never raises. Includes the mask↔mask_reference concordance check (cheap now that mask_reference exists).</span></li>
+      <li><b>Router / policy</b> <span class="m">router/policy.py</span><span class="note">profile → reject/process/passthrough; N=1 vs N&gt;1 branch — untestable on LUMIERE alone (no single-timepoint patients exist), needs a synthetic case.</span></li>
+      <li><b>Volumetry slice</b> <span class="m">volumetry/volumes.py</span><span class="note">Reproduce DeepBraTumIA's shipped enhancing/edema mm³ for ≥1 patient within rounding — the "contract is usable" proof.</span></li>
+      <li><b>Validator tests</b> <span class="m">tests/</span><span class="note">Synthetic bad cases: missing modality, misaligned mask, off-schema label. (The 42 existing tests cover contract/adapter, not validator logic yet.)</span></li>
+      <li><b>Cohort QC note</b><span class="note">Formal write-up of what surprised us. Ad hoc findings already in hand: Patient-025, the 12× anisotropy case, zero single-timepoint patients, atlas consistency.</span></li>
+    </ol>
+  </section>
+
+  <div class="notes">
+    <div class="note"><h4>Package deps</h4><p>numpy 2.5.1, nibabel 5.4.2 installed. pydantic NOT yet installed — deferred to step 4, where config-contract-in / QC-report-out actually need it.</p></div>
+    <div class="note"><h4>Package name</h4><p><code>rano</code> — chosen as a placeholder for "the product, not the dataset." Still cheap to rename if you want something else before more code references it.</p></div>
+  </div>
+
+  <footer>LUMIERE volumetric-RANO · Piece 1 progress · generated from verified session state, not memory.</footer>
+</div>
