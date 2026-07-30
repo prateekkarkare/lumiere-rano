@@ -1,0 +1,235 @@
+{
+  "locked_utc": "2026-07-30T15:37:29+00:00",
+  "source_contract": "data_contract_cohort.json",
+  "criterion": {
+    "assessable_timepoint": "usable DeepBraTumIA segmentation AND expert RANO label in {CR, PR, SD, PD}; Pre-Op/Post-Op excluded",
+    "min_assessable_per_patient": 6,
+    "split_rule": "partition by presence of a CR timepoint; within each stratum order by n_assessable desc then patient_id; every 4th -> practice, remainder -> held out",
+    "deterministic": true
+  },
+  "totals": {
+    "patients_screened": 91,
+    "patients_in_cohort": 24,
+    "assessable_timepoints_in_cohort": 225
+  },
+  "practice": {
+    "n_patients": 7,
+    "n_assessable_timepoints": 70,
+    "rating_mix": {
+      "PD": 42,
+      "SD": 12,
+      "CR": 11,
+      "PR": 5
+    },
+    "patients": [
+      {
+        "patient_id": "Patient-067",
+        "n_timepoints_total": 21,
+        "n_assessable": 15,
+        "assessable_timepoints": [
+          "week-013",
+          "week-033",
+          "week-042",
+          "week-053",
+          "week-068",
+          "week-073",
+          "week-077",
+          "week-079",
+          "week-092",
+          "week-109",
+          "week-124",
+          "week-136",
+          "week-152",
+          "week-156",
+          "week-167"
+        ],
+        "rating_mix": {
+          "PD": 10,
+          "SD": 5
+        },
+        "week_span": [
+          13.0,
+          167.0
+        ]
+      },
+      {
+        "patient_id": "Patient-031",
+        "n_timepoints_total": 18,
+        "n_assessable": 13,
+        "assessable_timepoints": [
+          "week-015",
+          "week-032",
+          "week-046",
+          "week-059",
+          "week-074",
+          "week-087",
+          "week-105",
+          "week-123",
+          "week-142",
+          "week-151",
+          "week-165",
+          "week-184",
+          "week-190"
+        ],
+        "rating_mix": {
+          "CR": 7,
+          "PD": 5,
+          "SD": 1
+        },
+        "week_span": [
+          15.0,
+          190.0
+        ]
+      },
+      {
+        "patient_id": "Patient-072",
+        "n_timepoints_total": 14,
+        "n_assessable": 11,
+        "assessable_timepoints": [
+          "week-013",
+          "week-021",
+          "week-029",
+          "week-037",
+          "week-046",
+          "week-055",
+          "week-064",
+          "week-073",
+          "week-078",
+          "week-090",
+          "week-105"
+        ],
+        "rating_mix": {
+          "PD": 9,
+          "SD": 1,
+          "PR": 1
+        },
+        "week_span": [
+          13.0,
+          105.0
+        ]
+      },
+      {
+        "patient_id": "Patient-032",
+        "n_timepoints_total": 13,
+        "n_assessable": 9,
+        "assessable_timepoints": [
+          "week-013",
+          "week-027",
+          "week-040",
+          "week-044",
+          "week-055",
+          "week-067",
+          "week-075",
+          "week-085",
+          "week-096"
+        ],
+        "rating_mix": {
+          "PD": 5,
+          "CR": 4
+        },
+        "week_span": [
+          13.0,
+          96.0
+        ]
+      },
+      {
+        "patient_id": "Patient-059",
+        "n_timepoints_total": 12,
+        "n_assessable": 9,
+        "assessable_timepoints": [
+          "week-014",
+          "week-024",
+          "week-040",
+          "week-055",
+          "week-068",
+          "week-084",
+          "week-100",
+          "week-116",
+          "week-136"
+        ],
+        "rating_mix": {
+          "PD": 6,
+          "PR": 3
+        },
+        "week_span": [
+          14.0,
+          136.0
+        ]
+      },
+      {
+        "patient_id": "Patient-054",
+        "n_timepoints_total": 10,
+        "n_assessable": 7,
+        "assessable_timepoints": [
+          "week-014",
+          "week-026",
+          "week-036",
+          "week-043",
+          "week-053",
+          "week-066",
+          "week-077"
+        ],
+        "rating_mix": {
+          "PD": 4,
+          "SD": 2,
+          "PR": 1
+        },
+        "week_span": [
+          14.0,
+          77.0
+        ]
+      },
+      {
+        "patient_id": "Patient-062",
+        "n_timepoints_total": 8,
+        "n_assessable": 6,
+        "assessable_timepoints": [
+          "week-015",
+          "week-030",
+          "week-042",
+          "week-050",
+          "week-057",
+          "week-064"
+        ],
+        "rating_mix": {
+          "SD": 3,
+          "PD": 3
+        },
+        "week_span": [
+          15.0,
+          64.0
+        ]
+      }
+    ]
+  },
+  "held_out": {
+    "n_patients": 17,
+    "n_assessable_timepoints": 155,
+    "rating_mix": {
+      "PD": 94,
+      "SD": 42,
+      "CR": 11,
+      "PR": 8
+    },
+    "discipline": "DO NOT INSPECT. IDs are recorded so the split is fixed and auditable. No trajectory, volume or rating of these patients may be examined until the scoring run.",
+    "patient_ids": [
+      "Patient-073",
+      "Patient-078",
+      "Patient-006",
+      "Patient-029",
+      "Patient-015",
+      "Patient-019",
+      "Patient-023",
+      "Patient-042",
+      "Patient-043",
+      "Patient-063",
+      "Patient-007",
+      "Patient-051",
+      "Patient-055",
+      "Patient-030",
+      "Patient-033",
+      "Patient-066",
+      "Patient-077"
+    ]
+  }
+}
