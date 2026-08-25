@@ -1,0 +1,226 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LUMIERE — Piece 1 Readiness Memo &amp; Closeout</title>
+<style>
+:root{--bg:#f7f7f5;--panel:#fff;--strip:#f2f2ef;--grid:#e6e6e1;--ink-1:#1a1a18;--ink-2:#3d3d39;
+--ink-3:#6b6b64;--ink-4:#9a9a92;--line:#e2e2dc;--accent:#b5533a;--ok:#3f7d4f;--warn:#b07d22;
+--no:#a4423a;--warn-bg:#fdf4ec;--warn-br:#e8b58a;}
+@media (prefers-color-scheme:dark){:root{--bg:#14140f;--panel:#1c1c18;--strip:#232320;--grid:#2f2f2a;
+--ink-1:#f0efe9;--ink-2:#d2d1c9;--ink-3:#9a998f;--ink-4:#6e6d64;--line:#2f2f2a;--accent:#e0876a;
+--ok:#7fbb8e;--warn:#dcae5c;--no:#e08b81;--warn-bg:#2a1f16;--warn-br:#6b4a2e;}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink-1);
+font:15px/1.65 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:960px;margin:0 auto;padding:44px 22px 90px}
+h1{font-size:27px;letter-spacing:-.02em;margin:0 0 6px}
+h2{font-size:19px;letter-spacing:-.01em;margin:44px 0 8px;padding-top:20px;border-top:1px solid var(--line)}
+h3{font-size:14px;margin:22px 0 6px}
+p{color:var(--ink-2);margin:9px 0;max-width:76ch}
+.sub{color:var(--ink-3);font-size:14px;margin-bottom:8px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 22px;margin:16px 0}
+.rule{border-left:3px solid var(--accent);padding-left:16px;margin:18px 0}
+.rule b{display:block;font-size:15px;margin-bottom:4px}
+table{border-collapse:collapse;width:100%;font-size:13.5px;margin:12px 0;table-layout:auto}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top;
+overflow-wrap:anywhere}
+th{color:var(--ink-3);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.s{font-weight:700;white-space:nowrap}
+.done{color:var(--ok)} .part{color:var(--warn)} .not{color:var(--no)}
+code{background:var(--strip);padding:1px 5px;border-radius:4px;font-size:12.5px;
+overflow-wrap:anywhere}
+.warn{background:var(--warn-bg);border:1px solid var(--warn-br);border-radius:10px;padding:16px 20px;margin:18px 0}
+ul{color:var(--ink-2);max-width:76ch}li{margin:4px 0}
+.foot{color:var(--ink-4);font-size:12px;margin-top:44px;border-top:1px solid var(--line);padding-top:16px}
+.big{font-size:20px;font-weight:700;letter-spacing:-.01em}
+</style></head><body><div class="wrap">
+
+<h1>Piece 1 — Readiness Memo &amp; Closeout</h1>
+<div class="sub">Data loader + validator + volumetry. Companion to the
+<code>docs/architecture.html</code> C4 map and <code>docs/volume_audit.html</code>.</div>
+
+<h2>Ledger — what is done and what is not</h2>
+<table>
+<thead><tr><th>item</th><th>status</th><th>evidence / gap</th></tr></thead>
+<tbody>
+<tr><td>Case contract + adapter seam</td><td class="s done">DONE</td>
+<td><code>contract/case.py</code>, <code>adapters/base.py</code>; <code>DicomAdapter</code> proves the ABC is satisfiable twice</td></tr>
+<tr><td>LUMIERE ingestion adapter</td><td class="s done">DONE</td>
+<td>91 patients / 638 timepoints reconcile exactly with the manifest; streams from the 32 GB zip</td></tr>
+<tr><td>Fingerprinter</td><td class="s done">DONE</td>
+<td><code>fingerprint/extractor.py</code> + pydantic record; atlas consistency 1,773/1,773 on one grid</td></tr>
+<tr><td>Volumetry</td><td class="s done">DONE</td>
+<td><code>volumetry/volumes.py</code>; reproduces shipped <code>measured_volumes_in_mm3.json</code> exactly (integration test)</td></tr>
+<tr><td>Atlas-vs-native volumetry audit</td><td class="s done">DONE</td>
+<td>90 patients / 591 timepoints / 5,776 comparisons — <code>docs/volume_audit.html</code></td></tr>
+<tr><td>Label decode corrected + re-run</td><td class="s done">DONE</td>
+<td>swap found and fixed; RANO check re-derived (below)</td></tr>
+<tr><td><code>data_contract.json</code></td><td class="s done">DONE</td>
+<td>3-patient and full 91-patient artifacts in <code>output/contract/</code></td></tr>
+<tr><td>Cohort locked + practice/held-out split</td><td class="s done">DONE</td>
+<td>24 patients / 225 assessable timepoints — <code>output/cohort/cohort_lock.json</code></td></tr>
+<tr><td>Mask–image grid alignment check</td><td class="s done">DONE</td>
+<td><code>validate/checks/mask_grid_alignment.py</code>, tolerance-based, split by translation / direction / spacing</td></tr>
+<tr><td>Modality-presence + label-validity checks</td><td class="s part">PARTIAL</td>
+<td>implemented inline in <code>scripts/emit_data_contract.py</code>, not yet as registered checks in <code>validate/checks/</code></td></tr>
+<tr><td>Validator registry / runner</td><td class="s not">NOT BUILT</td>
+<td>no "one bad check becomes a fail instead of a crash" wrapper; checks are called directly</td></tr>
+<tr><td>Capability profile type</td><td class="s part">PARTIAL</td>
+<td><code>readiness</code> (usable / needs_attention / unusable) exists on the contract; no dedicated <code>profile.py</code></td></tr>
+<tr><td>Router / policy layer</td><td class="s not">NOT BUILT</td>
+<td>no <code>router/policy.py</code>; nothing maps profile → reject · process · passthrough</td></tr>
+<tr><td>Config-driven contract</td><td class="s not">NOT BUILT</td>
+<td>required modalities are a module constant, not a pydantic config object</td></tr>
+<tr><td>Skull-strip sanity check</td><td class="s not">NOT BUILT</td>
+<td>listed in the Piece 1 brief; never implemented</td></tr>
+<tr><td>HD-GLIO second-opinion Dice</td><td class="s not">NOT BUILT</td>
+<td>role is ruled on (below) but no ET-vs-ET agreement is computed</td></tr>
+<tr><td>Cohort-wide QC surprise note</td><td class="s done">DONE</td>
+<td>superseded by, and folded into, the volumetry audit + this memo</td></tr>
+</tbody></table>
+<p><b>Tests:</b> 101 passing, including integration tests that reproduce the vendor volumes from the
+real archive. <b>Not committed:</b> everything above is working-tree only.</p>
+
+<h2>Ruling 1 — volumetry is computed in ATLAS space</h2>
+<div class="rule"><b>Atlas space (MNI 1&nbsp;mm) is the reporting space. No Jacobian correction is applied,
+because none is needed.</b>
+<p>The concern was that DeepBraTumIA's descriptor names neither the atlas nor the transform class, so if
+registration were affine or deformable, every reported mm³ would be scaled by a per-patient Jacobian
+determinant — invisible to Dice, invisible to an overlay, and fatal to every downstream RANO percentage.</p>
+<p><b>Decided directly rather than inferred:</b> all 2,396 <code>.tfm</code> files in the archive are
+<b>rigid</b> — 3×3 determinant 1.0000000000, orthonormal to 1.5e-15. A rigid transform cannot rescale volume.
+Confirmed by measurement: median native-vs-atlas deviation is <b>0.00%</b> at every anisotropy and every
+lesion size, over 5,776 comparisons. Zero masks touch the atlas field-of-view boundary, so clipping — the
+other silent volume-loss path — is also empirically dead.</p></div>
+
+<div class="warn">
+<b>The brief's fallback branch would have been the wrong move.</b>
+<p>The stated remedy for divergence was to report native-space back-transformed volumes instead. That
+assumes divergence means <i>bias</i>. What the data shows is <i>noise</i>: the native masks are the same
+segmentation resampled onto coarser grids, so they are strictly noisier, not truer. Switching the reported
+numbers to native space would add quantisation error and remove nothing. The correct amendment is neither
+branch of the original either/or — keep atlas, and attach a size-dependent uncertainty.</p>
+</div>
+
+<h3>The error bar is a function of lesion size, not of compartment</h3>
+<p>A single tolerance would be wrong by roughly 20× across the range. "The enhancing rim is the fragile
+compartment" is a confound — enhancing compartments are simply the smallest; control for size and the three
+compartments converge. p10–p90 spread on ≥6× anisotropic grids (the conservative end):</p>
+<table><thead><tr><th>compartment size</th><th class="n">spread</th><th>consequence</th></tr></thead><tbody>
+<tr><td>0.2–1 cm³</td><td class="n">36.6 pp</td><td>larger than a RANO response threshold — a call could flip on grid choice alone</td></tr>
+<tr><td>1–5 cm³</td><td class="n">14.8 pp</td><td>material; must be carried as uncertainty</td></tr>
+<tr><td>5–20 cm³</td><td class="n">5.3 pp</td><td>comfortable</td></tr>
+<tr><td>20–60 cm³</td><td class="n">2.8 pp</td><td>comfortable</td></tr>
+<tr><td>&gt; 60 cm³</td><td class="n">1.5 pp</td><td>negligible</td></tr>
+</tbody></table>
+<p>On isotropic native grids the same bands are 1.9 / 0.9 / 0.4 / 0.2 / 0.1 pp. These numbers are encoded as
+<code>VOLUME_UNCERTAINTY_PP</code> in <code>contract/data_contract.py</code> and every emitted volume carries
+its own <code>uncertainty_pp</code> — a volume is never reported as a bare number.</p>
+<p><b>Binding constraint on Piece 4:</b> the RANO engine must carry size-dependent confidence, and any
+new-lesion rule needs a minimum-volume floor below which a "change" is not reported as real.</p>
+
+<h2>Ruling 2 — the DeepBraTumIA label decode was wrong and is corrected</h2>
+<div class="rule"><b>Label 1 = contrast-enhancing. Label 2 = necrosis / non-enhancing. Label 3 = edema.</b>
+<p><code>label_schema.py</code> had 1 and 2 swapped, inherited from the <code>Label name</code> column of
+<code>LUMIERE-pyradiomics-deepbratumia-features.csv</code>, which is itself mislabeled — so the schema's
+"triangulation across three sources" in fact rested on one.</p>
+<p><b>The evidence was already in hand and was resolved the wrong way.</b> <code>lumiere_eda.ipynb</code>
+had derived the correct mapping empirically, by matching mask voxel counts to the JSON, and printed
+<code>{1: 'Enhancing', 2: 'Necrosis', 3: 'Edema'}</code> directly above the contradicting CSV table. The
+contradiction was seen, and closed with "use the 'Label name' STRING for volumetrics; the mask integers
+follow a different convention" — trusting the vendor's strings over the dataset's own numbers. The lesson
+is not "verify empirically", which was done; it is <b>when two sources disagree, the one that can be
+checked against physics wins</b>.</p>
+<p>Three independent checks establish the true mapping: the shipped
+<code>measured_volumes_in_mm3.json</code> matches <code>Enhancing_Core</code> to the label-1 count in
+<b>599/599</b> atlas masks; label 1 takes up contrast (median normalised CT1−T1 <b>+0.587</b>, enhancing more
+than label 2 in <b>51/52</b> sampled cases) while label <b>2 loses</b> signal (−0.073); and the resulting
+trajectories are clinically coherent. <code>COMPOSITE_REGIONS["DeepBraTumIA"]["ET"]</code> changed from
+<code>{2}</code> to <code>{1}</code>; TC and WT are unions and were unaffected.</p></div>
+
+<h3>Blast radius — narrower than it first looked</h3>
+<div class="warn"><b>The ~42% Task-1 figure is NOT invalidated and does not need re-running.</b>
+<p>That analysis read the shipped <code>measured_volumes_in_mm3.json</code> by key
+(<code>Enhancing_Core</code>), which was always the correct compartment. The swap only endangered code
+that reads MASK integers through <code>label_schema.py</code> — and this package's volumetry was the
+first such consumer, fixed before it shipped. <b>Nothing already published or concluded is wrong.</b>
+An earlier statement in this session that the M6c check "must be re-run" was mistaken.</p></div>
+<h3>Re-derivation from the mask, both ways</h3>
+<p>Not a repair of history — a measurement of what the bug would have cost, and a check that the
+mask-based path (which the pipeline will use) agrees with the JSON-based conclusion. A pure
+enhancing-volume rule (CR at zero; PD ≥ +40% vs nadir; PR ≤ −65% vs baseline; SD otherwise) over
+372 assessable timepoints:</p>
+<table><thead><tr><th>variant</th><th class="n">agreement</th><th class="n">CR recall</th><th class="n">PD</th><th class="n">PR</th><th class="n">SD</th></tr></thead><tbody>
+<tr><td><b>corrected</b> (enhancing = label 1)</td><td class="n"><b>55.9%</b></td><td class="n">57.7%</td><td class="n">78.3%</td><td class="n">35.0%</td><td class="n">2.2%</td></tr>
+<tr><td>swapped (enhancing = label 2)</td><td class="n">51.1%</td><td class="n">7.7%</td><td class="n">70.6%</td><td class="n">25.0%</td><td class="n">18.7%</td></tr>
+</tbody></table>
+<p>The CR column is the tell: complete response means the enhancing compartment vanishes, so watching the
+wrong label made CR nearly undetectable (7.7% → 57.7%, a 7.5× improvement). <b>Caveat:</b> this is a
+reimplementation of the rule, and it scores a different denominator than M6c did, so 55.9% is <i>not</i>
+directly comparable to the ~42% — only the corrected-vs-swapped delta under one identical rule is. The
+strategic conclusion is unchanged and reinforced: a single enhancing-volume signal is insufficient — SD
+recall is <b>2.2%</b>, i.e. the rule essentially cannot recognise stable disease — so the four-signal design
+stands.</p>
+
+<h2>Ruling 3 — HD-GLIO-AUTO is an ENHANCING-ONLY second opinion</h2>
+<div class="rule"><b>Only ET-vs-ET agreement is meaningful. HD-GLIO's non-enhancing class is not comparable
+to any single DeepBraTumIA compartment.</b>
+<p>HD-GLIO-AUTO emits two classes. Its label 1 merges edema, non-enhancing solid tumour <b>and necrosis</b>
+into one "T2/FLAIR non-enhancing" class — necrosis does not enhance, so it lands there. That class therefore
+straddles two DeepBraTumIA compartments (2 and 3) and cannot be differenced against either. It also means
+HD-GLIO cannot form a tumour core at all.</p>
+<p>Its enhancing class is clean, and its mapping was independently re-verified with the same contrast test
+that caught the DeepBraTumIA swap: <b>label 2 enhances in 40/40</b> sampled cases (median +0.571) while label
+1 does not (−0.034). HD-GLIO is <b>correct as documented</b> — the pyradiomics CSV happens to be right for
+this tool and wrong for the other, which is why per-tool verification is mandatory rather than optional.</p>
+<p>Consequence: the QC gate is Dice(ET<sub>DBT</sub>, ET<sub>HDG</sub>) only. No label fusion, no
+whole-tumour comparison, and HD-GLIO is never a co-equal volume source.</p></div>
+
+<h2>Cohort lock</h2>
+<p><b>Selection criterion.</b> A timepoint is <b>assessable</b> iff it has a usable DeepBraTumIA segmentation
+<i>and</i> an expert RANO response label in {CR, PR, SD, PD}. Pre-Op and Post-Op are excluded — they are
+surgical states, not response assessments, and would otherwise pad trajectories. A patient enters the cohort
+with <b>≥ 6</b> assessable timepoints, which is a trajectory-length requirement: fewer cannot exercise
+nadir / confirmation logic.</p>
+<p>Screening 91 patients / 638 timepoints: 591 usable segmentations, 616 expert ratings, <b>560</b> in the
+intersection, <b>372</b> of those carrying a response label. Applying the threshold gives the locked cohort.</p>
+
+<table><thead><tr><th>arm</th><th class="n">patients</th><th class="n">timepoints</th><th>rating mix</th></tr></thead><tbody>
+<tr><td><b>Cohort (locked)</b></td><td class="n">24</td><td class="n">225</td><td>—</td></tr>
+<tr><td>Practice</td><td class="n">7</td><td class="n">70</td><td>PD 42 · SD 12 · CR 11 · PR 5</td></tr>
+<tr><td>Held out (unexamined)</td><td class="n">17</td><td class="n">155</td><td>PD 94 · SD 42 · CR 11 · PR 8</td></tr>
+</tbody></table>
+
+<p><b>Practice arm:</b> Patient-067, -031, -072, -032, -059, -054, -062. Held-out IDs are recorded in
+<code>output/cohort/cohort_lock.json</code> so the split is fixed and auditable, and are deliberately not
+reproduced here.</p>
+<p><b>Split rule</b> — deterministic, no RNG. Partition by whether the trajectory contains a CR, then within
+each stratum order by assessable count descending (ties by ID) and take every 4th patient into practice. The
+CR stratification is not cosmetic: an unstratified stride put <i>all 22</i> CR timepoints in held-out, which
+would have left the practice arm unable to develop the complete-response branch at all. Both arms now carry
+all four response classes, and the held-out set holds 155 follow-ups — far past the ≥15 needed to score.</p>
+<p><b>Held-out discipline:</b> no trajectory, volume or rating of those 17 patients is inspected until the
+scoring run. Only aggregate label counts were read, and only to balance the split before any modelling.</p>
+
+<h2>Piece 1 — CLOSED</h2>
+<div class="card">
+<p class="big">Piece 1 is declared closed as of this memo.</p>
+<p>It delivers: an ingestion adapter behind a two-front-door seam, a lazy internal case contract, a
+fingerprinter, a grid-alignment validator, a volumetry stage that reproduces the vendor's own numbers
+exactly, a machine-readable data contract carrying volumes <i>with</i> uncertainty, and a locked cohort with
+a disciplined split. The single number the product emits has been audited and is defensible.</p>
+<p><b>Explicitly descoped into Piece 2</b> rather than left as silent debt: the validator registry/runner,
+a dedicated capability-profile type, the router/policy layer, the config-driven contract object, the
+skull-strip sanity check, and the HD-GLIO ET Dice gate. These are real gaps, listed in the ledger above; none
+of them block registration or the RANO engine, which is why they travel rather than hold the gate.</p>
+<p><b>Correction owed:</b> <code>docs/architecture.html</code> currently marks volumetry and the router as
+built. Volumetry now is; the router is not. That diagram needs one edit to stop overstating.</p>
+</div>
+
+<div class="foot">Artifacts: <code>output/contract/data_contract.json</code> ·
+<code>output/contract/data_contract_cohort.json</code> · <code>output/cohort/cohort_lock.json</code> ·
+<code>output/volume_audit/volumes.csv</code> · <code>output/rano_check/volumetric_rano_check.json</code>.
+Scripts: <code>emit_data_contract.py</code> · <code>lock_cohort.py</code> ·
+<code>audit_atlas_native_volumes.py</code> · <code>render_volume_audit.py</code> ·
+<code>rerun_volumetric_rano_check.py</code>.</div>
+</div></body></html>

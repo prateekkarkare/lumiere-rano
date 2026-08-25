@@ -7,6 +7,15 @@ LUMIERE-*.pdf
 *.nii
 *.nii.gz
 
+# ---- generated ----
+# Everything under output/ is regenerable from scripts/ and stays untracked — EXCEPT the cohort
+# lock, which is a frozen decision, not a build artifact. If it isn't version-controlled it can
+# drift silently, and a drifting split is worse than no split at all.
+output/*
+!output/cohort/
+output/cohort/*
+!output/cohort/cohort_lock.json
+
 # ---- Python ----
 .venv/
 __pycache__/
@@ -20,3 +29,4 @@ dist/
 # ---- local tooling ----
 .claude/settings.local.json
 .DS_Store
+Imaging/*

@@ -10,11 +10,12 @@ requires-python = ">=3.11"
 dependencies = [
     "numpy>=1.26",
     "nibabel>=5.0",
+    # pydantic lives at Piece 1's edges (config contract in, QC report out); the fingerprint
+    # record (fingerprint/schema.py) is the first "QC report out" edge, so it's core now.
+    "pydantic>=2.0",
 ]
 
 [project.optional-dependencies]
-# pydantic arrives with Piece 1's edges (config contract in, QC report out); not needed yet.
-config = ["pydantic>=2.0"]
 test = ["pytest>=8.0"]
 
 [tool.setuptools.packages.find]

@@ -12,7 +12,15 @@ Layout, per ``Imaging/<patient>/<timepoint>/``:
     DeepBraTumIA-segmentation/atlas/skull_strip/
         <seq>_skull_strip.nii.gz                             image in mask space, MNI  (seq lower)
         brain_mask.nii.gz                                    brain mask, MNI
+    DeepBraTumIA-segmentation/native/segmentation/
+        <seq>_seg_mask.nii.gz                                atlas mask back-transformed onto
+                                                             THAT sequence's native grid (seq lower)
+    DeepBraTumIA-segmentation/native/transformation/
+        <seq>.tfm                                            ITK rigid transform (verified det==1)
     HD-GLIO-AUTO-segmentation/registered/segmentation.nii.gz second-opinion mask (QC only)
+
+Verified counts in Imaging-v202211.zip: 599 atlas masks, and 599 native masks for EACH of the
+four sequences (2,396 total) — the native set is never partially present.
 """
 
 from __future__ import annotations
@@ -37,6 +45,7 @@ SS_SEQ: dict[Modality, str] = {
 
 _TP = "Imaging/{p}/{tp}"
 _DBT = _TP + "/DeepBraTumIA-segmentation/atlas"
+_NATIVE = _TP + "/DeepBraTumIA-segmentation/native"
 
 
 def raw_image(patient: str, tp: str, modality: Modality) -> str:
@@ -49,6 +58,20 @@ def dbt_mask(patient: str, tp: str) -> str:
 
 def dbt_volumes_json(patient: str, tp: str) -> str:
     return f"{_DBT.format(p=patient, tp=tp)}/segmentation/measured_volumes_in_mm3.json"
+
+
+def dbt_native_mask(patient: str, tp: str, modality: Modality) -> str:
+    """The atlas mask back-transformed by DeepBraTumIA onto ``modality``'s own native grid.
+
+    One per sequence, because each sequence has its own acquisition grid — these are four
+    resamplings of ONE segmentation, not four independent segmentations.
+    """
+    return f"{_NATIVE.format(p=patient, tp=tp)}/segmentation/{SS_SEQ[modality]}_seg_mask.nii.gz"
+
+
+def dbt_native_transform(patient: str, tp: str, modality: Modality) -> str:
+    """ITK ``.tfm`` relating ``modality``'s native grid to the atlas. Rigid (det == 1)."""
+    return f"{_NATIVE.format(p=patient, tp=tp)}/transformation/{SS_SEQ[modality]}.tfm"
 
 
 def dbt_skull_strip(patient: str, tp: str, modality: Modality) -> str:

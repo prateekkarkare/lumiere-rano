@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "rano-report-preview",
+      "runtimeExecutable": ".venv/bin/python",
+      "runtimeArgs": ["-m", "http.server", "8931", "--directory", "output/rano_calls"],
+      "port": 8931
+    }
+  ]
+}
