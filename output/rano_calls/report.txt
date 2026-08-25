@@ -1,0 +1,57 @@
+==============================================================================
+RANO calls vs expert ratings
+==============================================================================
+volumes         DeepBraTumIA measured_volumes_in_mm3.json (Imaging-v202211.zip)
+timepoints      599 with volumes, 396 with a scorable expert rating
+patients        91   cohort filter: all
+rt-end-week     10 (pseudoprogression window anchor; cohort-level assumption)
+unmatched       19 rated timepoints have no volumes, e.g. [('Patient-009', 'week-026'), ('Patient-023', 'week-070'), ('Patient-028', 'week-046')]
+
+------------------------------------------------------------------------------
+PROFILE SUMMARY
+------------------------------------------------------------------------------
+mrano_volumetric         n=376   agree  58.5%   balanced  38.8%   CR 42%  PR 10%  SD 26%  PD 77%
+
+  mrano_volumetric: Volumetric RANO with Ellingson-style thresholds: PD at +40% vs nadir, PR at -65% vs baseline. The cutoffs are the volume-space equivalents of the bidimensional ones.
+
+==============================================================================
+PROFILE  mrano_volumetric
+==============================================================================
+  expert\calc     CR    PR    SD    PD      n   recall
+------------------------------------------------------
+           CR     11     4     7     4     26     42% 
+           PR      .     2     7    11     20     10% 
+           SD     22     3    24    43     92     26% 
+           PD      7     2    46   183    238     77% 
+------------------------------------------------------
+    precision    28%   18%   29%   76%
+
+  agreement 220/376 = 58.5%   (majority-class baseline 63.3%)
+  balanced accuracy (mean per-class recall) 38.8%
+  135/376 calls made with at least one RANO component unavailable
+
+  by cohort arm:
+    held_out                 n=155   agree  56.1%   balanced  34.7%   CR 27%  PR 12%  SD 19%  PD 80%
+    practice                 n=70    agree  58.6%   balanced  37.4%   CR 55%  PR 0%  SD 17%  PD 79%
+    unassigned               n=151   agree  60.9%   balanced  43.7%   CR 50%  PR 14%  SD 37%  PD 74%
+
+==============================================================================
+CASE TABLES  mrano_volumetric  (worst agreement first)
+==============================================================================
+Patient-058   0/3 = 0%
+----------------------------------------------------------------------------
+  week-015     ✗   3,430 mm3   -36% vs nadir   -36% vs baseline
+               expert PD  Target L.: 13mm x 32mm
+               calc   SD  neither response nor progression (-36% vs nadir)
+                          not available to the rule: new_lesion, clinical
+
+  week-027     ✗   178 mm3   -95% vs nadir   -97% vs baseline
+               expert PR  (no rationale recorded)
+               calc   SD  PR not confirmed at week-036 (+9 wk, scored PD)
+                          not available to the rule: new_lesion, clinical
+
+  week-036     ✗   1,313 mm3   +638% vs nadir   -76% vs baseline
+               expert PR  (no rationale recorded)
+               calc   PD  enhancing volume +638% vs nadir (>= +40%)
+
+

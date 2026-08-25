@@ -1,0 +1,1980 @@
+{
+  "patient_id": "Patient-003",
+  "n_timepoints": 5,
+  "timepoints": [
+    {
+      "id": "Patient-003/week-000-1",
+      "label": "week-000-1",
+      "week_offset": 0.0,
+      "modalities": {
+        "CT1": {
+          "role": "modality:CT1",
+          "source": "Imaging/Patient-003/week-000-1/CT1.nii.gz",
+          "space": "native:Imaging/Patient-003/week-000-1/CT1.nii.gz",
+          "geometry": {
+            "shape": [
+              512,
+              512,
+              140
+            ],
+            "spacing": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "orientation": "LPS",
+            "dtype": "uint16",
+            "anisotropy_ratio": 1.0,
+            "affine": [
+              [
+                -1.0,
+                0.0,
+                0.0,
+                -0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0,
+                -0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "intensity": {
+            "n_voxels": 3944666,
+            "mean": 307.29811193140307,
+            "std": 128.59067029400595,
+            "min": 1.0,
+            "max": 1315.0,
+            "median": 306.0,
+            "p0_5": 7.0,
+            "p99_5": 851.0
+          },
+          "label_histogram": null,
+          "compartment_intensity": null
+        },
+        "T2": {
+          "role": "modality:T2",
+          "source": "Imaging/Patient-003/week-000-1/T2.nii.gz",
+          "space": "native:Imaging/Patient-003/week-000-1/T2.nii.gz",
+          "geometry": {
+            "shape": [
+              512,
+              512,
+              176
+            ],
+            "spacing": [
+              0.501953125,
+              0.501953125,
+              1.0
+            ],
+            "orientation": "PIR",
+            "dtype": "uint16",
+            "anisotropy_ratio": 1.9922178988326849,
+            "affine": [
+              [
+                -0.0,
+                0.0,
+                1.0,
+                -89.52430725097656
+              ],
+              [
+                -0.501953125,
+                -0.0,
+                -0.0,
+                160.1763458251953
+              ],
+              [
+                0.0,
+                -0.501953125,
+                0.0,
+                117.70481872558594
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "intensity": {
+            "n_voxels": 5885675,
+            "mean": 181.85922719144364,
+            "std": 77.89369367199295,
+            "min": 1.0,
+            "max": 704.0,
+            "median": 166.0,
+            "p0_5": 13.0,
+            "p99_5": 487.0
+          },
+          "label_histogram": null,
+          "compartment_intensity": null
+        }
+      },
+      "mask": null,
+      "mask_source": null,
+      "mask_reference": null,
+      "brain_mask": null
+    },
+    {
+      "id": "Patient-003/week-000-2",
+      "label": "week-000-2",
+      "week_offset": 0.0,
+      "modalities": {
+        "CT1": {
+          "role": "modality:CT1",
+          "source": "Imaging/Patient-003/week-000-2/CT1.nii.gz",
+          "space": "native:Imaging/Patient-003/week-000-2/CT1.nii.gz",
+          "geometry": {
+            "shape": [
+              256,
+              256,
+              160
+            ],
+            "spacing": [
+              0.9999999764959643,
+              1.0000000027041251,
+              1.0000113083130187
+            ],
+            "orientation": "PIR",
+            "dtype": "uint16",
+            "anisotropy_ratio": 1.0000113318173207,
+            "affine": [
+              [
+                0.28860652446746826,
+                0.0017191704828292131,
+                0.9574570655822754,
+                -130.29080200195312
+              ],
+              [
+                -0.9574477672576904,
+                0.0005181788583286107,
+                0.2886093556880951,
+                127.23799133300781
+              ],
+              [
+                3.4643104385168044e-8,
+                -0.9999983906745911,
+                0.0017955861985683441,
+                117.84899139404297
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "intensity": {
+            "n_voxels": 1513431,
+            "mean": 509.71909852513926,
+            "std": 148.32645519916244,
+            "min": 1.0,
+            "max": 2184.0,
+            "median": 519.0,
+            "p0_5": 68.0,
+            "p99_5": 1175.0
+          },
+          "label_histogram": null,
+          "compartment_intensity": null
+        },
+        "T1": {
+          "role": "modality:T1",
+          "source": "Imaging/Patient-003/week-000-2/T1.nii.gz",
+          "space": "native:Imaging/Patient-003/week-000-2/T1.nii.gz",
+          "geometry": {
+            "shape": [
+              280,
+              320,
+              24
+            ],
+            "spacing": [
+              0.6874999691965483,
+              0.6874999584710362,
+              5.9999986839574095
+            ],
+            "orientation": "LPS",
+            "dtype": "uint16",
+            "anisotropy_ratio": 8.727271340206466,
+            "affine": [
+              [
+                -0.6769764423370361,
+                0.11815132200717926,
+                -0.17440809309482574,
+                68.86808013916016
+              ],
+              [
+                -0.11895096302032471,
+                -0.6764602065086365,
+                0.2630441188812256,
+                128.56106567382812
+              ],
+              [
+                -0.014483527280390263,
+                0.03313679248094559,
+                5.991692066192627,
+                -42.44709014892578
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "intensity": {
+            "n_voxels": 530868,
+            "mean": 436.30423947195914,
+            "std": 99.08457878148843,
+            "min": 1.0,
+            "max": 1294.0,
+            "median": 454.0,
+            "p0_5": 97.0,
+            "p99_5": 713.0
+          },
+          "label_histogram": null,
+          "compartment_intensity": null
+        },
+        "T2": {
+          "role": "modality:T2",
+          "source": "Imaging/Patient-003/week-000-2/T2.nii.gz",
+          "space": "native:Imaging/Patient-003/week-000-2/T2.nii.gz",
+          "geometry": {
+            "shape": [
+              390,
+              448,
+              24
+            ],
+            "spacing": [
+              0.4910714043478722,
+              0.49107139020383694,
+              5.999997726817437
+            ],
+            "orientation": "LPS",
+            "dtype": "uint16",
+            "anisotropy_ratio": 12.218178143766268,
+            "affine": [
+              [
+                -0.4835546016693115,
+                0.08439377695322037,
+                -0.17440806329250336,
+                68.384521484375
+              ],
+              [
+                -0.08496496081352234,
+                -0.48318585753440857,
+                0.2630440294742584,
+                128.47610473632812
+              ],
+              [
+                -0.01034537609666586,
+                0.023669131100177765,
+                5.9916911125183105,
+                -42.457435607910156
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "intensity": {
+            "n_voxels": 1021105,
+            "mean": 460.6966335489494,
+            "std": 246.96947843545618,
+            "min": 1.0,
+            "max": 1829.0,
+            "median": 394.0,
+            "p0_5": 70.0,
+            "p99_5": 1567.0
+          },
+          "label_histogram": null,
+          "compartment_intensity": null
+        },
+        "FLAIR": {
+          "role": "modality:FLAIR",
+          "source": "Imaging/Patient-003/week-000-2/FLAIR.nii.gz",
+          "space": "native:Imaging/Patient-003/week-000-2/FLAIR.nii.gz",
+          "geometry": {
+            "shape": [
+              448,
+              512,
+              38
+            ],
+            "spacing": [
+              0.4296874987870512,
+              0.42968750982704146,
+              4.80000198835756
+            ],
+            "orientation": "LIP",
+            "dtype": "uint16",
+            "anisotropy_ratio": 11.170913749893367,
+            "affine": [
+              [
+                -0.414393812417984,
+                0.006766004022210836,
+                1.266967535018921,
+                58.626705169677734
+              ],
+              [
+                -0.11275006830692291,
+                -0.07741302251815796,
+                -4.550361633300781,
+                127.48918151855469
+              ],
+              [
+                0.014019163325428963,
+                -0.42260241508483887,
+                0.8538274765014648,
+                94.41481018066406
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "intensity": {
+            "n_voxels": 1662860,
+            "mean": 382.1738029659743,
+            "std": 132.68190638198203,
+            "min": 1.0,
+            "max": 1597.0,
+            "median": 380.0,
+            "p0_5": 21.0,
+            "p99_5": 912.0
+          },
+          "label_histogram": null,
+          "compartment_intensity": null
+        }
+      },
+      "mask": {
+        "role": "mask",
+        "source": "Imaging/Patient-003/week-000-2/DeepBraTumIA-segmentation/atlas/segmentation/seg_mask.nii.gz",
+        "space": "mni152_1mm:mni152_1mm",
+        "geometry": {
+          "shape": [
+            182,
+            218,
+            182
+          ],
+          "spacing": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "orientation": "LAS",
+          "dtype": "int8",
+          "anisotropy_ratio": 1.0,
+          "affine": [
+            [
+              -1.0,
+              0.0,
+              0.0,
+              90.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0,
+              -126.0
+            ],
+            [
+              0.0,
+              0.0,
+              1.0,
+              -72.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        "intensity": null,
+        "label_histogram": [
+          {
+            "label": 0,
+            "n_voxels": 7094859
+          },
+          {
+            "label": 1,
+            "n_voxels": 15418
+          },
+          {
+            "label": 2,
+            "n_voxels": 51297
+          },
+          {
+            "label": 3,
+            "n_voxels": 59458
+          }
+        ],
+        "compartment_intensity": null
+      },
+      "mask_source": "DeepBraTumIA",
+      "mask_reference": {
+        "role": "mask_reference",
+        "source": "Imaging/Patient-003/week-000-2/DeepBraTumIA-segmentation/atlas/skull_strip/ct1_skull_strip.nii.gz",
+        "space": "mni152_1mm:mni152_1mm",
+        "geometry": {
+          "shape": [
+            182,
+            218,
+            182
+          ],
+          "spacing": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "orientation": "LAS",
+          "dtype": "float32",
+          "anisotropy_ratio": 1.0,
+          "affine": [
+            [
+              -1.0,
+              0.0,
+              0.0,
+              90.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0,
+              -126.0
+            ],
+            [
+              0.0,
+              0.0,
+              1.0,
+              -72.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        "intensity": {
+          "n_voxels": 1530143,
+          "mean": 504.3954162597656,
+          "std": 142.9915771484375,
+          "min": 2.109741449356079,
+          "max": 1933.1314697265625,
+          "median": 516.6487426757812,
+          "p0_5": 67.0993423461914,
+          "p99_5": 1095.51953125
+        },
+        "label_histogram": null,
+        "compartment_intensity": [
+          {
+            "label": 0,
+            "stats": {
+              "n_voxels": 7094859,
+              "mean": 100.01495361328125,
+              "std": 211.05996704101562,
+              "min": 0.0,
+              "max": 1930.905517578125,
+              "median": 0.0,
+              "p0_5": 0.0,
+              "p99_5": 705.1163940429688
+            }
+          },
+          {
+            "label": 1,
+            "stats": {
+              "n_voxels": 15418,
+              "mean": 718.5879516601562,
+              "std": 145.08901977539062,
+              "min": 369.6414794921875,
+              "max": 1933.1314697265625,
+              "median": 693.4102783203125,
+              "p0_5": 508.3434753417969,
+              "p99_5": 1494.1121826171875
+            }
+          },
+          {
+            "label": 2,
+            "stats": {
+              "n_voxels": 51297,
+              "mean": 367.7882080078125,
+              "std": 92.33525085449219,
+              "min": 7.841095924377441,
+              "max": 714.7238159179688,
+              "median": 340.4022521972656,
+              "p0_5": 34.793365478515625,
+              "p99_5": 630.4404907226562
+            }
+          },
+          {
+            "label": 3,
+            "stats": {
+              "n_voxels": 59458,
+              "mean": 542.559814453125,
+              "std": 81.26907348632812,
+              "min": 22.893714904785156,
+              "max": 928.0275268554688,
+              "median": 550.8558349609375,
+              "p0_5": 241.7239227294922,
+              "p99_5": 721.0386962890625
+            }
+          }
+        ]
+      },
+      "brain_mask": {
+        "role": "brain_mask",
+        "source": "Imaging/Patient-003/week-000-2/DeepBraTumIA-segmentation/atlas/skull_strip/brain_mask.nii.gz",
+        "space": "mni152_1mm:mni152_1mm",
+        "geometry": {
+          "shape": [
+            182,
+            218,
+            182
+          ],
+          "spacing": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "orientation": "LAS",
+          "dtype": "int8",
+          "anisotropy_ratio": 1.0,
+          "affine": [
+            [
+              -1.0,
+              0.0,
+              0.0,
+              90.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0,
+              -126.0
+            ],
+            [
+              0.0,
+              0.0,
+              1.0,
+              -72.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        "intensity": null,
+        "label_histogram": null,
+        "compartment_intensity": null
+      }
+    },
+    {
+      "id": "Patient-003/week-014",
+      "label": "week-014",
+      "week_offset": 14.0,
+      "modalities": {
+        "CT1": {
+          "role": "modality:CT1",
+          "source": "Imaging/Patient-003/week-014/CT1.nii.gz",
+          "space": "native:Imaging/Patient-003/week-014/CT1.nii.gz",
+          "geometry": {
+            "shape": [
+              256,
+              256,
+              160
+            ],
+            "spacing": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "orientation": "PIR",
+            "dtype": "uint16",
+            "anisotropy_ratio": 1.0,
+            "affine": [
+              [
+                -0.0,
+                0.0,
+                1.0,
+                -79.5
+              ],
+              [
+                -1.0,
+                -0.0,
+                -0.0,
+                166.62588500976562
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0,
+                101.29071807861328
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "intensity": {
+            "n_voxels": 1516475,
+            "mean": 500.0213725910417,
+            "std": 157.85556512417267,
+            "min": 1.0,
+            "max": 2127.0,
+            "median": 515.0,
+            "p0_5": 78.0,
+            "p99_5": 1132.0
+          },
+          "label_histogram": null,
+          "compartment_intensity": null
+        },
+        "T1": {
+          "role": "modality:T1",
+          "source": "Imaging/Patient-003/week-014/T1.nii.gz",
+          "space": "native:Imaging/Patient-003/week-014/T1.nii.gz",
+          "geometry": {
+            "shape": [
+              280,
+              320,
+              24
+            ],
+            "spacing": [
+              0.6875000184141149,
+              0.6874999887430212,
+              5.999999338212902
+            ],
+            "orientation": "LPS",
+            "dtype": "uint16",
+            "anisotropy_ratio": 8.727271907571806,
+            "affine": [
+              [
+                -0.6873534321784973,
+                -2.459495940243528e-10,
+                0.12389487028121948,
+                94.0242691040039
+              ],
+              [
+                -0.0023680017329752445,
+                -0.677868127822876,
+                -1.0006123781204224,
+                138.46055603027344
+              ],
+              [
+                0.013997398316860199,
+                -0.11467796564102173,
+                5.91467809677124,
+                -34.653289794921875
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "intensity": {
+            "n_voxels": 522093,
+            "mean": 398.4473666568983,
+            "std": 94.78494579552812,
+            "min": 1.0,
+            "max": 1114.0,
+            "median": 423.0,
+            "p0_5": 113.46000000000004,
+            "p99_5": 544.0
+          },
+          "label_histogram": null,
+          "compartment_intensity": null
+        },
+        "T2": {
+          "role": "modality:T2",
+          "source": "Imaging/Patient-003/week-014/T2.nii.gz",
+          "space": "native:Imaging/Patient-003/week-014/T2.nii.gz",
+          "geometry": {
+            "shape": [
+              390,
+              448,
+              24
+            ],
+            "spacing": [
+              0.4910714119115741,
+              0.4910714075821644,
+              6.000003199450931
+            ],
+            "orientation": "LPS",
+            "dtype": "uint16",
+            "anisotropy_ratio": 12.218188855654422,
+            "affine": [
+              [
+                -0.49096670746803284,
+                -1.011863162703186e-10,
+                0.12389493733644485,
+                93.53329467773438
+              ],
+              [
+                -0.0016914296429604292,
+                -0.48419150710105896,
+                -1.0006129741668701,
+                138.4588623046875
+              ],
+              [
+                0.00999814085662365,
+                -0.08191283047199249,
+                5.914681911468506,
+                -34.64329528808594
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "intensity": {
+            "n_voxels": 1019486,
+            "mean": 475.66070745454084,
+            "std": 212.83355827566126,
+            "min": 1.0,
+            "max": 1463.0,
+            "median": 413.0,
+            "p0_5": 91.0,
+            "p99_5": 1180.0
+          },
+          "label_histogram": null,
+          "compartment_intensity": null
+        },
+        "FLAIR": {
+          "role": "modality:FLAIR",
+          "source": "Imaging/Patient-003/week-014/FLAIR.nii.gz",
+          "space": "native:Imaging/Patient-003/week-014/FLAIR.nii.gz",
+          "geometry": {
+            "shape": [
+              448,
+              512,
+              38
+            ],
+            "spacing": [
+              0.4296874821471502,
+              0.4296875022465723,
+              4.7999985619652445
+            ],
+            "orientation": "LIP",
+            "dtype": "uint16",
+            "anisotropy_ratio": 11.170906208343867,
+            "affine": [
+              [
+                -0.4296455979347229,
+                -0.005999374203383923,
+                1.606168531509411e-9,
+                97.77645874023438
+              ],
+              [
+                0.000376703537767753,
+                -0.0269776601344347,
+                -4.790526866912842,
+                104.21775817871094
+              ],
+              [
+                0.005987535696476698,
+                -0.42879781126976013,
+                0.3013943135738373,
+                87.819091796875
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "intensity": {
+            "n_voxels": 1639582,
+            "mean": 339.3739599483283,
+            "std": 122.39092413635383,
+            "min": 1.0,
+            "max": 1107.0,
+            "median": 364.0,
+            "p0_5": 10.0,
+            "p99_5": 593.0
+          },
+          "label_histogram": null,
+          "compartment_intensity": null
+        }
+      },
+      "mask": {
+        "role": "mask",
+        "source": "Imaging/Patient-003/week-014/DeepBraTumIA-segmentation/atlas/segmentation/seg_mask.nii.gz",
+        "space": "mni152_1mm:mni152_1mm",
+        "geometry": {
+          "shape": [
+            182,
+            218,
+            182
+          ],
+          "spacing": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "orientation": "LAS",
+          "dtype": "int8",
+          "anisotropy_ratio": 1.0,
+          "affine": [
+            [
+              -1.0,
+              0.0,
+              0.0,
+              90.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0,
+              -126.0
+            ],
+            [
+              0.0,
+              0.0,
+              1.0,
+              -72.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        "intensity": null,
+        "label_histogram": [
+          {
+            "label": 0,
+            "n_voxels": 7190652
+          },
+          {
+            "label": 1,
+            "n_voxels": 59
+          },
+          {
+            "label": 2,
+            "n_voxels": 13182
+          },
+          {
+            "label": 3,
+            "n_voxels": 17139
+          }
+        ],
+        "compartment_intensity": null
+      },
+      "mask_source": "DeepBraTumIA",
+      "mask_reference": {
+        "role": "mask_reference",
+        "source": "Imaging/Patient-003/week-014/DeepBraTumIA-segmentation/atlas/skull_strip/ct1_skull_strip.nii.gz",
+        "space": "mni152_1mm:mni152_1mm",
+        "geometry": {
+          "shape": [
+            182,
+            218,
+            182
+          ],
+          "spacing": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "orientation": "LAS",
+          "dtype": "float32",
+          "anisotropy_ratio": 1.0,
+          "affine": [
+            [
+              -1.0,
+              0.0,
+              0.0,
+              90.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0,
+              -126.0
+            ],
+            [
+              0.0,
+              0.0,
+              1.0,
+              -72.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        "intensity": {
+          "n_voxels": 1502690,
+          "mean": 500.7640075683594,
+          "std": 145.28651428222656,
+          "min": 7.101188659667969,
+          "max": 1845.6982421875,
+          "median": 513.9542236328125,
+          "p0_5": 119.05828094482422,
+          "p99_5": 1057.611572265625
+        },
+        "label_histogram": null,
+        "compartment_intensity": [
+          {
+            "label": 0,
+            "stats": {
+              "n_voxels": 7190652,
+              "mean": 102.9405517578125,
+              "std": 213.01170349121094,
+              "min": 0.0,
+              "max": 1845.6982421875,
+              "median": 0.0,
+              "p0_5": 0.0,
+              "p99_5": 721.1005249023438
+            }
+          },
+          {
+            "label": 1,
+            "stats": {
+              "n_voxels": 59,
+              "mean": 693.3323364257812,
+              "std": 90.7573471069336,
+              "min": 546.124267578125,
+              "max": 1012.6560668945312,
+              "median": 687.37841796875,
+              "p0_5": 554.837890625,
+              "p99_5": 996.0276489257812
+            }
+          },
+          {
+            "label": 2,
+            "stats": {
+              "n_voxels": 13182,
+              "mean": 198.87210083007812,
+              "std": 62.52024841308594,
+              "min": 120.78529357910156,
+              "max": 689.42529296875,
+              "median": 181.7127227783203,
+              "p0_5": 147.338134765625,
+              "p99_5": 520.64990234375
+            }
+          },
+          {
+            "label": 3,
+            "stats": {
+              "n_voxels": 17139,
+              "mean": 561.3495483398438,
+              "std": 64.7662353515625,
+              "min": 233.15826416015625,
+              "max": 894.3504028320312,
+              "median": 569.31982421875,
+              "p0_5": 347.5061950683594,
+              "p99_5": 693.181884765625
+            }
+          }
+        ]
+      },
+      "brain_mask": {
+        "role": "brain_mask",
+        "source": "Imaging/Patient-003/week-014/DeepBraTumIA-segmentation/atlas/skull_strip/brain_mask.nii.gz",
+        "space": "mni152_1mm:mni152_1mm",
+        "geometry": {
+          "shape": [
+            182,
+            218,
+            182
+          ],
+          "spacing": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "orientation": "LAS",
+          "dtype": "int8",
+          "anisotropy_ratio": 1.0,
+          "affine": [
+            [
+              -1.0,
+              0.0,
+              0.0,
+              90.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0,
+              -126.0
+            ],
+            [
+              0.0,
+              0.0,
+              1.0,
+              -72.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        "intensity": null,
+        "label_histogram": null,
+        "compartment_intensity": null
+      }
+    },
+    {
+      "id": "Patient-003/week-027",
+      "label": "week-027",
+      "week_offset": 27.0,
+      "modalities": {
+        "CT1": {
+          "role": "modality:CT1",
+          "source": "Imaging/Patient-003/week-027/CT1.nii.gz",
+          "space": "native:Imaging/Patient-003/week-027/CT1.nii.gz",
+          "geometry": {
+            "shape": [
+              256,
+              256,
+              160
+            ],
+            "spacing": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "orientation": "PIR",
+            "dtype": "uint16",
+            "anisotropy_ratio": 1.0,
+            "affine": [
+              [
+                -0.0,
+                0.0,
+                1.0,
+                -81.37646484375
+              ],
+              [
+                -1.0,
+                -0.0,
+                -0.0,
+                154.93670654296875
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0,
+                113.27863311767578
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "intensity": {
+            "n_voxels": 1512901,
+            "mean": 540.9103127038716,
+            "std": 175.18839543434862,
+            "min": 1.0,
+            "max": 2062.0,
+            "median": 560.0,
+            "p0_5": 84.0,
+            "p99_5": 1240.0
+          },
+          "label_histogram": null,
+          "compartment_intensity": null
+        },
+        "T1": {
+          "role": "modality:T1",
+          "source": "Imaging/Patient-003/week-027/T1.nii.gz",
+          "space": "native:Imaging/Patient-003/week-027/T1.nii.gz",
+          "geometry": {
+            "shape": [
+              280,
+              320,
+              24
+            ],
+            "spacing": [
+              0.6874999751028283,
+              0.6875000284103537,
+              6.000001558076658
+            ],
+            "orientation": "LPS",
+            "dtype": "uint16",
+            "anisotropy_ratio": 8.727275309616187,
+            "affine": [
+              [
+                -0.6872548460960388,
+                -3.84588853818979e-11,
+                -0.16020964086055756,
+                98.48243713378906
+              ],
+              [
+                0.005369084421545267,
+                -0.6574376225471497,
+                -1.7542309761047363,
+                125.90679168701172
+              ],
+              [
+                -0.01755463518202305,
+                -0.20107725262641907,
+                5.735592842102051,
+                -5.861076831817627
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "intensity": {
+            "n_voxels": 513906,
+            "mean": 357.3096519596969,
+            "std": 94.47468557539159,
+            "min": 1.0,
+            "max": 916.0,
+            "median": 376.0,
+            "p0_5": 110.0,
+            "p99_5": 510.0
+          },
+          "label_histogram": null,
+          "compartment_intensity": null
+        },
+        "T2": {
+          "role": "modality:T2",
+          "source": "Imaging/Patient-003/week-027/T2.nii.gz",
+          "space": "native:Imaging/Patient-003/week-027/T2.nii.gz",
+          "geometry": {
+            "shape": [
+              390,
+              448,
+              24
+            ],
+            "spacing": [
+              0.4910714065119346,
+              0.49107140973235297,
+              5.999999558922586
+            ],
+            "orientation": "LPS",
+            "dtype": "uint16",
+            "anisotropy_ratio": 12.218181468842591,
+            "affine": [
+              [
+                -0.4908963143825531,
+                8.182726024541509e-11,
+                -0.16020958125591278,
+                97.99153900146484
+              ],
+              [
+                0.0038350599352270365,
+                -0.46959826350212097,
+                -1.7542303800582886,
+                122.73072052001953
+              ],
+              [
+                -0.012539024464786053,
+                -0.1436266005039215,
+                5.735590934753418,
+                -6.84618616104126
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "intensity": {
+            "n_voxels": 1027878,
+            "mean": 514.5228655540833,
+            "std": 235.59627466504466,
+            "min": 1.0,
+            "max": 1501.0,
+            "median": 441.0,
+            "p0_5": 99.0,
+            "p99_5": 1295.0
+          },
+          "label_histogram": null,
+          "compartment_intensity": null
+        },
+        "FLAIR": {
+          "role": "modality:FLAIR",
+          "source": "Imaging/Patient-003/week-027/FLAIR.nii.gz",
+          "space": "native:Imaging/Patient-003/week-027/FLAIR.nii.gz",
+          "geometry": {
+            "shape": [
+              448,
+              512,
+              38
+            ],
+            "spacing": [
+              0.4296874986855397,
+              0.42968750432906233,
+              4.79999565538659
+            ],
+            "orientation": "LIP",
+            "dtype": "uint16",
+            "anisotropy_ratio": 11.170899013981774,
+            "affine": [
+              [
+                -0.42940250039100647,
+                -0.013956858776509762,
+                0.07902594655752182,
+                98.27644348144531
+              ],
+              [
+                -0.006497340742498636,
+                -0.01768501102924347,
+                -4.795379161834717,
+                91.99373626708984
+              ],
+              [
+                0.014234596863389015,
+                -0.4290964901447296,
+                0.19506892561912537,
+                105.48137664794922
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "intensity": {
+            "n_voxels": 1627389,
+            "mean": 362.5961389686178,
+            "std": 135.51613873661552,
+            "min": 1.0,
+            "max": 1121.0,
+            "median": 392.0,
+            "p0_5": 11.0,
+            "p99_5": 659.0
+          },
+          "label_histogram": null,
+          "compartment_intensity": null
+        }
+      },
+      "mask": {
+        "role": "mask",
+        "source": "Imaging/Patient-003/week-027/DeepBraTumIA-segmentation/atlas/segmentation/seg_mask.nii.gz",
+        "space": "mni152_1mm:mni152_1mm",
+        "geometry": {
+          "shape": [
+            182,
+            218,
+            182
+          ],
+          "spacing": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "orientation": "LAS",
+          "dtype": "int8",
+          "anisotropy_ratio": 1.0,
+          "affine": [
+            [
+              -1.0,
+              0.0,
+              0.0,
+              90.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0,
+              -126.0
+            ],
+            [
+              0.0,
+              0.0,
+              1.0,
+              -72.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        "intensity": null,
+        "label_histogram": [
+          {
+            "label": 0,
+            "n_voxels": 7182031
+          },
+          {
+            "label": 2,
+            "n_voxels": 21711
+          },
+          {
+            "label": 3,
+            "n_voxels": 17290
+          }
+        ],
+        "compartment_intensity": null
+      },
+      "mask_source": "DeepBraTumIA",
+      "mask_reference": {
+        "role": "mask_reference",
+        "source": "Imaging/Patient-003/week-027/DeepBraTumIA-segmentation/atlas/skull_strip/ct1_skull_strip.nii.gz",
+        "space": "mni152_1mm:mni152_1mm",
+        "geometry": {
+          "shape": [
+            182,
+            218,
+            182
+          ],
+          "spacing": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "orientation": "LAS",
+          "dtype": "float32",
+          "anisotropy_ratio": 1.0,
+          "affine": [
+            [
+              -1.0,
+              0.0,
+              0.0,
+              90.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0,
+              -126.0
+            ],
+            [
+              0.0,
+              0.0,
+              1.0,
+              -72.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        "intensity": {
+          "n_voxels": 1483164,
+          "mean": 542.705322265625,
+          "std": 160.59237670898438,
+          "min": 5.059263706207275,
+          "max": 1780.6861572265625,
+          "median": 559.628173828125,
+          "p0_5": 131.8373260498047,
+          "p99_5": 1161.7774658203125
+        },
+        "label_histogram": null,
+        "compartment_intensity": [
+          {
+            "label": 0,
+            "stats": {
+              "n_voxels": 7182031,
+              "mean": 109.96919250488281,
+              "std": 230.29991149902344,
+              "min": 0.0,
+              "max": 1780.6861572265625,
+              "median": 0.0,
+              "p0_5": 0.0,
+              "p99_5": 772.7108764648438
+            }
+          },
+          {
+            "label": 2,
+            "stats": {
+              "n_voxels": 21711,
+              "mean": 230.7364044189453,
+              "std": 89.77399444580078,
+              "min": 149.22381591796875,
+              "max": 651.828369140625,
+              "median": 198.16099548339844,
+              "p0_5": 169.66896057128906,
+              "p99_5": 575.3908081054688
+            }
+          },
+          {
+            "label": 3,
+            "stats": {
+              "n_voxels": 17290,
+              "mean": 584.6905517578125,
+              "std": 63.23176956176758,
+              "min": 264.16259765625,
+              "max": 760.9656372070312,
+              "median": 589.51318359375,
+              "p0_5": 392.4811096191406,
+              "p99_5": 707.5894775390625
+            }
+          }
+        ]
+      },
+      "brain_mask": {
+        "role": "brain_mask",
+        "source": "Imaging/Patient-003/week-027/DeepBraTumIA-segmentation/atlas/skull_strip/brain_mask.nii.gz",
+        "space": "mni152_1mm:mni152_1mm",
+        "geometry": {
+          "shape": [
+            182,
+            218,
+            182
+          ],
+          "spacing": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "orientation": "LAS",
+          "dtype": "int8",
+          "anisotropy_ratio": 1.0,
+          "affine": [
+            [
+              -1.0,
+              0.0,
+              0.0,
+              90.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0,
+              -126.0
+            ],
+            [
+              0.0,
+              0.0,
+              1.0,
+              -72.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        "intensity": null,
+        "label_histogram": null,
+        "compartment_intensity": null
+      }
+    },
+    {
+      "id": "Patient-003/week-038",
+      "label": "week-038",
+      "week_offset": 38.0,
+      "modalities": {
+        "CT1": {
+          "role": "modality:CT1",
+          "source": "Imaging/Patient-003/week-038/CT1.nii.gz",
+          "space": "native:Imaging/Patient-003/week-038/CT1.nii.gz",
+          "geometry": {
+            "shape": [
+              256,
+              256,
+              176
+            ],
+            "spacing": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "orientation": "PIR",
+            "dtype": "uint16",
+            "anisotropy_ratio": 1.0,
+            "affine": [
+              [
+                -0.0,
+                0.0,
+                1.0,
+                -84.52647399902344
+              ],
+              [
+                -1.0,
+                -0.0,
+                -0.0,
+                160.87255859375
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0,
+                136.78768920898438
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "intensity": {
+            "n_voxels": 1486229,
+            "mean": 252.65251519113139,
+            "std": 92.759504189884,
+            "min": 1.0,
+            "max": 1250.0,
+            "median": 248.0,
+            "p0_5": 51.0,
+            "p99_5": 674.0
+          },
+          "label_histogram": null,
+          "compartment_intensity": null
+        },
+        "T1": {
+          "role": "modality:T1",
+          "source": "Imaging/Patient-003/week-038/T1.nii.gz",
+          "space": "native:Imaging/Patient-003/week-038/T1.nii.gz",
+          "geometry": {
+            "shape": [
+              448,
+              512,
+              24
+            ],
+            "spacing": [
+              0.42968747022019826,
+              0.4296875087127595,
+              6.000001196338451
+            ],
+            "orientation": "LPS",
+            "dtype": "uint16",
+            "anisotropy_ratio": 13.963640115602352,
+            "affine": [
+              [
+                -0.4288164973258972,
+                -0.005987797863781452,
+                -0.37256497144699097,
+                101.57608795166016
+              ],
+              [
+                0.013425714336335659,
+                -0.4113493859767914,
+                -1.7239744663238525,
+                137.64212036132812
+              ],
+              [
+                -0.023821920156478882,
+                -0.12404508888721466,
+                5.734903812408447,
+                23.77253532409668
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "intensity": {
+            "n_voxels": 1354191,
+            "mean": 388.8315304118843,
+            "std": 79.79467522957466,
+            "min": 3.0,
+            "max": 1561.0,
+            "median": 410.0,
+            "p0_5": 121.0,
+            "p99_5": 509.0
+          },
+          "label_histogram": null,
+          "compartment_intensity": null
+        },
+        "T2": {
+          "role": "modality:T2",
+          "source": "Imaging/Patient-003/week-038/T2.nii.gz",
+          "space": "native:Imaging/Patient-003/week-038/T2.nii.gz",
+          "geometry": {
+            "shape": [
+              448,
+              512,
+              24
+            ],
+            "spacing": [
+              0.42968747022019826,
+              0.4296875087127595,
+              6.000001196338451
+            ],
+            "orientation": "LPS",
+            "dtype": "uint16",
+            "anisotropy_ratio": 13.963640115602352,
+            "affine": [
+              [
+                -0.4288164973258972,
+                -0.005987797863781452,
+                -0.37256497144699097,
+                101.57608795166016
+              ],
+              [
+                0.013425714336335659,
+                -0.4113493859767914,
+                -1.7239744663238525,
+                137.64212036132812
+              ],
+              [
+                -0.023821920156478882,
+                -0.12404508888721466,
+                5.734903812408447,
+                23.77253532409668
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "intensity": {
+            "n_voxels": 1338066,
+            "mean": 488.6909539589228,
+            "std": 224.11655485279087,
+            "min": 1.0,
+            "max": 1572.0,
+            "median": 428.0,
+            "p0_5": 105.0,
+            "p99_5": 1304.0
+          },
+          "label_histogram": null,
+          "compartment_intensity": null
+        },
+        "FLAIR": {
+          "role": "modality:FLAIR",
+          "source": "Imaging/Patient-003/week-038/FLAIR.nii.gz",
+          "space": "native:Imaging/Patient-003/week-038/FLAIR.nii.gz",
+          "geometry": {
+            "shape": [
+              372,
+              448,
+              36
+            ],
+            "spacing": [
+              0.4910714081776691,
+              0.49107143476091775,
+              4.39999875158094
+            ],
+            "orientation": "LIP",
+            "dtype": "uint16",
+            "anisotropy_ratio": 8.95999782986556,
+            "affine": [
+              [
+                -0.49102354049682617,
+                0.00685642845928669,
+                1.7114966111009267e-9,
+                92.16609954833984
+              ],
+              [
+                -0.00021536544954869896,
+                -0.015423396602272987,
+                -4.397827625274658,
+                87.2119369506836
+              ],
+              [
+                -0.006853044964373112,
+                -0.4907812774181366,
+                0.1382070630788803,
+                134.04519653320312
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "intensity": {
+            "n_voxels": 1344256,
+            "mean": 271.9403268425062,
+            "std": 97.46493423700134,
+            "min": 1.0,
+            "max": 895.0,
+            "median": 283.0,
+            "p0_5": 7.0,
+            "p99_5": 495.0
+          },
+          "label_histogram": null,
+          "compartment_intensity": null
+        }
+      },
+      "mask": {
+        "role": "mask",
+        "source": "Imaging/Patient-003/week-038/DeepBraTumIA-segmentation/atlas/segmentation/seg_mask.nii.gz",
+        "space": "mni152_1mm:mni152_1mm",
+        "geometry": {
+          "shape": [
+            182,
+            218,
+            182
+          ],
+          "spacing": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "orientation": "LAS",
+          "dtype": "int8",
+          "anisotropy_ratio": 1.0,
+          "affine": [
+            [
+              -1.0,
+              0.0,
+              0.0,
+              90.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0,
+              -126.0
+            ],
+            [
+              0.0,
+              0.0,
+              1.0,
+              -72.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        "intensity": null,
+        "label_histogram": [
+          {
+            "label": 0,
+            "n_voxels": 7092389
+          },
+          {
+            "label": 1,
+            "n_voxels": 31454
+          },
+          {
+            "label": 2,
+            "n_voxels": 8975
+          },
+          {
+            "label": 3,
+            "n_voxels": 88214
+          }
+        ],
+        "compartment_intensity": null
+      },
+      "mask_source": "DeepBraTumIA",
+      "mask_reference": {
+        "role": "mask_reference",
+        "source": "Imaging/Patient-003/week-038/DeepBraTumIA-segmentation/atlas/skull_strip/ct1_skull_strip.nii.gz",
+        "space": "mni152_1mm:mni152_1mm",
+        "geometry": {
+          "shape": [
+            182,
+            218,
+            182
+          ],
+          "spacing": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "orientation": "LAS",
+          "dtype": "float32",
+          "anisotropy_ratio": 1.0,
+          "affine": [
+            [
+              -1.0,
+              0.0,
+              0.0,
+              90.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0,
+              -126.0
+            ],
+            [
+              0.0,
+              0.0,
+              1.0,
+              -72.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        "intensity": {
+          "n_voxels": 1508498,
+          "mean": 251.36277770996094,
+          "std": 87.781005859375,
+          "min": 9.231621742248535,
+          "max": 1106.1898193359375,
+          "median": 247.18408203125,
+          "p0_5": 62.598785400390625,
+          "p99_5": 645.1043701171875
+        },
+        "label_histogram": null,
+        "compartment_intensity": [
+          {
+            "label": 0,
+            "stats": {
+              "n_voxels": 7092389,
+              "mean": 47.9102783203125,
+              "std": 104.54869079589844,
+              "min": 0.0,
+              "max": 1106.1898193359375,
+              "median": 0.0,
+              "p0_5": 0.0,
+              "p99_5": 423.31829833984375
+            }
+          },
+          {
+            "label": 1,
+            "stats": {
+              "n_voxels": 31454,
+              "mean": 438.4622497558594,
+              "std": 75.05577850341797,
+              "min": 296.91021728515625,
+              "max": 772.2822875976562,
+              "median": 422.79754638671875,
+              "p0_5": 322.00048828125,
+              "p99_5": 667.9197998046875
+            }
+          },
+          {
+            "label": 2,
+            "stats": {
+              "n_voxels": 8975,
+              "mean": 264.5956726074219,
+              "std": 63.79133987426758,
+              "min": 50.88645553588867,
+              "max": 451.36712646484375,
+              "median": 281.4086608886719,
+              "p0_5": 88.10014343261719,
+              "p99_5": 360.67132568359375
+            }
+          },
+          {
+            "label": 3,
+            "stats": {
+              "n_voxels": 88214,
+              "mean": 263.1756896972656,
+              "std": 38.96963882446289,
+              "min": 129.6555633544922,
+              "max": 494.2276916503906,
+              "median": 258.9250793457031,
+              "p0_5": 178.01100158691406,
+              "p99_5": 379.85113525390625
+            }
+          }
+        ]
+      },
+      "brain_mask": {
+        "role": "brain_mask",
+        "source": "Imaging/Patient-003/week-038/DeepBraTumIA-segmentation/atlas/skull_strip/brain_mask.nii.gz",
+        "space": "mni152_1mm:mni152_1mm",
+        "geometry": {
+          "shape": [
+            182,
+            218,
+            182
+          ],
+          "spacing": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "orientation": "LAS",
+          "dtype": "int8",
+          "anisotropy_ratio": 1.0,
+          "affine": [
+            [
+              -1.0,
+              0.0,
+              0.0,
+              90.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0,
+              -126.0
+            ],
+            [
+              0.0,
+              0.0,
+              1.0,
+              -72.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        "intensity": null,
+        "label_histogram": null,
+        "compartment_intensity": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,2258 @@
+{
+  "provenance": {
+    "generated_utc": "2026-07-30T15:32:36+00:00",
+    "schema_version": "1.0",
+    "source_archive": "Imaging-v202211.zip",
+    "manifest": "LUMIERE-datacompleteness.csv",
+    "adapter": "lumiere-zip",
+    "mask_source": "DeepBraTumIA",
+    "label_schema_note": "DeepBraTumIA label 1 = contrast-enhancing, 2 = necrosis/non-enhancing. Corrected 2026-07-30; the pyradiomics CSV 'Label name' column has these swapped. Verified 599/599 against shipped measured_volumes_in_mm3.json and by contrast uptake.",
+    "volumetry_space": "atlas:mni152_1mm",
+    "volumetry_ruling": "Volumes are computed in atlas space (MNI 1mm). The patient->atlas transforms are RIGID (2,396/2,396 .tfm with |det| = 1 to 1e-10), so there is no Jacobian scaling and no per-patient volume bias. Measured median native-vs-atlas deviation is 0.00% at every anisotropy and every lesion size. Native back-transformed masks are NOT used for reported numbers -- being resampled onto coarser grids they are noisier, not truer. Precision depends on lesion SIZE, not compartment; see uncertainty_pp.",
+    "hdglio_role": "HD-GLIO-AUTO is an independent second opinion on the ENHANCING compartment ONLY. Its label 1 merges edema, non-enhancing tumour AND necrosis into one class, so it is not comparable to any single DeepBraTumIA compartment and cannot form TC. Only ET-vs-ET agreement is meaningful. Its label mapping (2 = enhancing) was independently re-verified 2026-07-30 and is correct as documented."
+  },
+  "patients": [
+    {
+      "patient_id": "Patient-001",
+      "n_timepoints": 4,
+      "n_usable": 4,
+      "n_assessable": 2,
+      "is_longitudinal": true,
+      "timepoints": [
+        {
+          "id": "Patient-001/week-000-1",
+          "label": "week-000-1",
+          "week_offset": 0.0,
+          "modalities": {
+            "CT1": {
+              "source": "Imaging/Patient-001/week-000-1/CT1.nii.gz",
+              "space": "native:Imaging/Patient-001/week-000-1/CT1.nii.gz",
+              "shape": [
+                256,
+                256,
+                192
+              ],
+              "spacing_mm": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "anisotropy_ratio": 1.0,
+              "voxel_mm3": 1.0
+            },
+            "T1": {
+              "source": "Imaging/Patient-001/week-000-1/T1.nii.gz",
+              "space": "native:Imaging/Patient-001/week-000-1/T1.nii.gz",
+              "shape": [
+                640,
+                640,
+                24
+              ],
+              "spacing_mm": [
+                0.35937499129696127,
+                0.3593749919806565,
+                6.00000284196107
+              ],
+              "anisotropy_ratio": 16.6957,
+              "voxel_mm3": 0.774903
+            },
+            "T2": {
+              "source": "Imaging/Patient-001/week-000-1/T2.nii.gz",
+              "space": "native:Imaging/Patient-001/week-000-1/T2.nii.gz",
+              "shape": [
+                512,
+                512,
+                24
+              ],
+              "spacing_mm": [
+                0.4492187390979906,
+                0.44921875244559467,
+                6.000002842045094
+              ],
+              "anisotropy_ratio": 13.3565,
+              "voxel_mm3": 1.210785
+            },
+            "FLAIR": {
+              "source": "Imaging/Patient-001/week-000-1/FLAIR.nii.gz",
+              "space": "native:Imaging/Patient-001/week-000-1/FLAIR.nii.gz",
+              "shape": [
+                640,
+                640,
+                40
+              ],
+              "spacing_mm": [
+                0.35937503535926796,
+                0.3593749899321012,
+                4.39999903325669
+              ],
+              "anisotropy_ratio": 12.2435,
+              "voxel_mm3": 0.568262
+            }
+          },
+          "mask": {
+            "source": "Imaging/Patient-001/week-000-1/DeepBraTumIA-segmentation/atlas/segmentation/seg_mask.nii.gz",
+            "space": "mni152_1mm:mni152_1mm",
+            "shape": [
+              182,
+              218,
+              182
+            ],
+            "spacing_mm": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "anisotropy_ratio": 1.0,
+            "voxel_mm3": 1.0
+          },
+          "mask_source": "DeepBraTumIA",
+          "compartment_volumes": {
+            "enhancing": {
+              "volume_mm3": 16751.0,
+              "uncertainty_pp": 5.3,
+              "space": "atlas:mni152_1mm"
+            },
+            "necrosis_nonenhancing": {
+              "volume_mm3": 13262.0,
+              "uncertainty_pp": 5.3,
+              "space": "atlas:mni152_1mm"
+            },
+            "edema": {
+              "volume_mm3": 43488.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "region_volumes": {
+            "ET": {
+              "volume_mm3": 16751.0,
+              "uncertainty_pp": 5.3,
+              "space": "atlas:mni152_1mm"
+            },
+            "TC": {
+              "volume_mm3": 30013.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            },
+            "WT": {
+              "volume_mm3": 73501.0,
+              "uncertainty_pp": 1.5,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "expert_rating": "Pre-Op",
+          "checks": [
+            {
+              "code": "modalities_present",
+              "status": "pass",
+              "detail": "all required modalities present"
+            },
+            {
+              "code": "mask_present",
+              "status": "pass",
+              "detail": "DeepBraTumIA mask resolved"
+            },
+            {
+              "code": "mask_grid_alignment.ok",
+              "status": "pass",
+              "detail": "mask and mask_reference share one grid within tolerance"
+            },
+            {
+              "code": "label_schema_valid",
+              "status": "pass",
+              "detail": "all mask integers are documented in label_schema.py"
+            },
+            {
+              "code": "expert_rating_present",
+              "status": "warn",
+              "detail": "expert RANO rating: Pre-Op"
+            }
+          ],
+          "readiness": "needs_attention"
+        },
+        {
+          "id": "Patient-001/week-000-2",
+          "label": "week-000-2",
+          "week_offset": 0.0,
+          "modalities": {
+            "CT1": {
+              "source": "Imaging/Patient-001/week-000-2/CT1.nii.gz",
+              "space": "native:Imaging/Patient-001/week-000-2/CT1.nii.gz",
+              "shape": [
+                512,
+                512,
+                176
+              ],
+              "spacing_mm": [
+                0.5,
+                0.5,
+                1.0
+              ],
+              "anisotropy_ratio": 2.0,
+              "voxel_mm3": 0.25
+            },
+            "T1": {
+              "source": "Imaging/Patient-001/week-000-2/T1.nii.gz",
+              "space": "native:Imaging/Patient-001/week-000-2/T1.nii.gz",
+              "shape": [
+                280,
+                320,
+                24
+              ],
+              "spacing_mm": [
+                0.6875000515155769,
+                0.687500016277995,
+                6.000000389467003
+              ],
+              "anisotropy_ratio": 8.7273,
+              "voxel_mm3": 2.835938
+            },
+            "T2": {
+              "source": "Imaging/Patient-001/week-000-2/T2.nii.gz",
+              "space": "native:Imaging/Patient-001/week-000-2/T2.nii.gz",
+              "shape": [
+                448,
+                512,
+                24
+              ],
+              "spacing_mm": [
+                0.42968750343567147,
+                0.4296875026317883,
+                6.000000389467003
+              ],
+              "anisotropy_ratio": 13.9636,
+              "voxel_mm3": 1.107788
+            },
+            "FLAIR": {
+              "source": "Imaging/Patient-001/week-000-2/FLAIR.nii.gz",
+              "space": "native:Imaging/Patient-001/week-000-2/FLAIR.nii.gz",
+              "shape": [
+                228,
+                256,
+                32
+              ],
+              "spacing_mm": [
+                0.7812500096575556,
+                0.7812499797699364,
+                4.8000008209688
+              ],
+              "anisotropy_ratio": 6.144,
+              "voxel_mm3": 2.929688
+            }
+          },
+          "mask": {
+            "source": "Imaging/Patient-001/week-000-2/DeepBraTumIA-segmentation/atlas/segmentation/seg_mask.nii.gz",
+            "space": "mni152_1mm:mni152_1mm",
+            "shape": [
+              182,
+              218,
+              182
+            ],
+            "spacing_mm": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "anisotropy_ratio": 1.0,
+            "voxel_mm3": 1.0
+          },
+          "mask_source": "DeepBraTumIA",
+          "compartment_volumes": {
+            "enhancing": {
+              "volume_mm3": 6799.0,
+              "uncertainty_pp": 5.3,
+              "space": "atlas:mni152_1mm"
+            },
+            "necrosis_nonenhancing": {
+              "volume_mm3": 4557.0,
+              "uncertainty_pp": 14.8,
+              "space": "atlas:mni152_1mm"
+            },
+            "edema": {
+              "volume_mm3": 32506.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "region_volumes": {
+            "ET": {
+              "volume_mm3": 6799.0,
+              "uncertainty_pp": 5.3,
+              "space": "atlas:mni152_1mm"
+            },
+            "TC": {
+              "volume_mm3": 11356.0,
+              "uncertainty_pp": 5.3,
+              "space": "atlas:mni152_1mm"
+            },
+            "WT": {
+              "volume_mm3": 43862.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "expert_rating": "Post-Op",
+          "checks": [
+            {
+              "code": "modalities_present",
+              "status": "pass",
+              "detail": "all required modalities present"
+            },
+            {
+              "code": "mask_present",
+              "status": "pass",
+              "detail": "DeepBraTumIA mask resolved"
+            },
+            {
+              "code": "mask_grid_alignment.ok",
+              "status": "pass",
+              "detail": "mask and mask_reference share one grid within tolerance"
+            },
+            {
+              "code": "label_schema_valid",
+              "status": "pass",
+              "detail": "all mask integers are documented in label_schema.py"
+            },
+            {
+              "code": "expert_rating_present",
+              "status": "warn",
+              "detail": "expert RANO rating: Post-Op"
+            }
+          ],
+          "readiness": "needs_attention"
+        },
+        {
+          "id": "Patient-001/week-044",
+          "label": "week-044",
+          "week_offset": 44.0,
+          "modalities": {
+            "CT1": {
+              "source": "Imaging/Patient-001/week-044/CT1.nii.gz",
+              "space": "native:Imaging/Patient-001/week-044/CT1.nii.gz",
+              "shape": [
+                640,
+                640,
+                24
+              ],
+              "spacing_mm": [
+                0.3593750088378026,
+                0.3593749938477683,
+                5.999996676017598
+              ],
+              "anisotropy_ratio": 16.6956,
+              "voxel_mm3": 0.774902
+            },
+            "T1": {
+              "source": "Imaging/Patient-001/week-044/T1.nii.gz",
+              "space": "native:Imaging/Patient-001/week-044/T1.nii.gz",
+              "shape": [
+                640,
+                640,
+                24
+              ],
+              "spacing_mm": [
+                0.3593750088378026,
+                0.3593749938477683,
+                5.999992767075309
+              ],
+              "anisotropy_ratio": 16.6956,
+              "voxel_mm3": 0.774901
+            },
+            "T2": {
+              "source": "Imaging/Patient-001/week-044/T2.nii.gz",
+              "space": "native:Imaging/Patient-001/week-044/T2.nii.gz",
+              "shape": [
+                256,
+                256,
+                24
+              ],
+              "spacing_mm": [
+                0.8984375221341785,
+                0.898437540366338,
+                5.999992767075309
+              ],
+              "anisotropy_ratio": 6.6783,
+              "voxel_mm3": 4.843134
+            },
+            "FLAIR": {
+              "source": "Imaging/Patient-001/week-044/FLAIR.nii.gz",
+              "space": "native:Imaging/Patient-001/week-044/FLAIR.nii.gz",
+              "shape": [
+                256,
+                256,
+                30
+              ],
+              "spacing_mm": [
+                0.8984375247509259,
+                0.8984375028709392,
+                6.0000026522215295
+              ],
+              "anisotropy_ratio": 6.6783,
+              "voxel_mm3": 4.843142
+            }
+          },
+          "mask": {
+            "source": "Imaging/Patient-001/week-044/DeepBraTumIA-segmentation/atlas/segmentation/seg_mask.nii.gz",
+            "space": "mni152_1mm:mni152_1mm",
+            "shape": [
+              182,
+              218,
+              182
+            ],
+            "spacing_mm": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "anisotropy_ratio": 1.0,
+            "voxel_mm3": 1.0
+          },
+          "mask_source": "DeepBraTumIA",
+          "compartment_volumes": {
+            "enhancing": {
+              "volume_mm3": 5.0,
+              "uncertainty_pp": 36.6,
+              "space": "atlas:mni152_1mm"
+            },
+            "necrosis_nonenhancing": {
+              "volume_mm3": 18615.0,
+              "uncertainty_pp": 5.3,
+              "space": "atlas:mni152_1mm"
+            },
+            "edema": {
+              "volume_mm3": 18780.0,
+              "uncertainty_pp": 5.3,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "region_volumes": {
+            "ET": {
+              "volume_mm3": 5.0,
+              "uncertainty_pp": 36.6,
+              "space": "atlas:mni152_1mm"
+            },
+            "TC": {
+              "volume_mm3": 18620.0,
+              "uncertainty_pp": 5.3,
+              "space": "atlas:mni152_1mm"
+            },
+            "WT": {
+              "volume_mm3": 37400.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "expert_rating": "SD",
+          "checks": [
+            {
+              "code": "modalities_present",
+              "status": "pass",
+              "detail": "all required modalities present"
+            },
+            {
+              "code": "mask_present",
+              "status": "pass",
+              "detail": "DeepBraTumIA mask resolved"
+            },
+            {
+              "code": "mask_grid_alignment.ok",
+              "status": "pass",
+              "detail": "mask and mask_reference share one grid within tolerance"
+            },
+            {
+              "code": "label_schema_valid",
+              "status": "pass",
+              "detail": "all mask integers are documented in label_schema.py"
+            },
+            {
+              "code": "expert_rating_present",
+              "status": "pass",
+              "detail": "expert RANO rating: SD"
+            }
+          ],
+          "readiness": "usable"
+        },
+        {
+          "id": "Patient-001/week-056",
+          "label": "week-056",
+          "week_offset": 56.0,
+          "modalities": {
+            "CT1": {
+              "source": "Imaging/Patient-001/week-056/CT1.nii.gz",
+              "space": "native:Imaging/Patient-001/week-056/CT1.nii.gz",
+              "shape": [
+                256,
+                256,
+                24
+              ],
+              "spacing_mm": [
+                0.8984374740677571,
+                0.8984375257996287,
+                5.99999836349704
+              ],
+              "anisotropy_ratio": 6.6783,
+              "voxel_mm3": 4.843138
+            },
+            "T1": {
+              "source": "Imaging/Patient-001/week-056/T1.nii.gz",
+              "space": "native:Imaging/Patient-001/week-056/T1.nii.gz",
+              "shape": [
+                256,
+                256,
+                30
+              ],
+              "spacing_mm": [
+                0.8984374738197263,
+                0.8984375236821659,
+                4.99999858371272
+              ],
+              "anisotropy_ratio": 5.5652,
+              "voxel_mm3": 4.035949
+            },
+            "T2": {
+              "source": "Imaging/Patient-001/week-056/T2.nii.gz",
+              "space": "native:Imaging/Patient-001/week-056/T2.nii.gz",
+              "shape": [
+                288,
+                288,
+                23
+              ],
+              "spacing_mm": [
+                0.8333332980802703,
+                0.8333333040354126,
+                5.49999721455782
+              ],
+              "anisotropy_ratio": 6.6,
+              "voxel_mm3": 3.819442
+            },
+            "FLAIR": {
+              "source": "Imaging/Patient-001/week-056/FLAIR.nii.gz",
+              "space": "native:Imaging/Patient-001/week-056/FLAIR.nii.gz",
+              "shape": [
+                256,
+                256,
+                24
+              ],
+              "spacing_mm": [
+                0.8984374738197263,
+                0.8984375236821659,
+                6.0000013532172085
+              ],
+              "anisotropy_ratio": 6.6783,
+              "voxel_mm3": 4.843141
+            }
+          },
+          "mask": {
+            "source": "Imaging/Patient-001/week-056/DeepBraTumIA-segmentation/atlas/segmentation/seg_mask.nii.gz",
+            "space": "mni152_1mm:mni152_1mm",
+            "shape": [
+              182,
+              218,
+              182
+            ],
+            "spacing_mm": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "anisotropy_ratio": 1.0,
+            "voxel_mm3": 1.0
+          },
+          "mask_source": "DeepBraTumIA",
+          "compartment_volumes": {
+            "enhancing": {
+              "volume_mm3": 3597.0,
+              "uncertainty_pp": 14.8,
+              "space": "atlas:mni152_1mm"
+            },
+            "necrosis_nonenhancing": {
+              "volume_mm3": 0.0,
+              "uncertainty_pp": 36.6,
+              "space": "atlas:mni152_1mm"
+            },
+            "edema": {
+              "volume_mm3": 2397.0,
+              "uncertainty_pp": 14.8,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "region_volumes": {
+            "ET": {
+              "volume_mm3": 3597.0,
+              "uncertainty_pp": 14.8,
+              "space": "atlas:mni152_1mm"
+            },
+            "TC": {
+              "volume_mm3": 3597.0,
+              "uncertainty_pp": 14.8,
+              "space": "atlas:mni152_1mm"
+            },
+            "WT": {
+              "volume_mm3": 5994.0,
+              "uncertainty_pp": 5.3,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "expert_rating": "PD",
+          "checks": [
+            {
+              "code": "modalities_present",
+              "status": "pass",
+              "detail": "all required modalities present"
+            },
+            {
+              "code": "mask_present",
+              "status": "pass",
+              "detail": "DeepBraTumIA mask resolved"
+            },
+            {
+              "code": "mask_grid_alignment.ok",
+              "status": "pass",
+              "detail": "mask and mask_reference share one grid within tolerance"
+            },
+            {
+              "code": "label_schema_valid",
+              "status": "pass",
+              "detail": "all mask integers are documented in label_schema.py"
+            },
+            {
+              "code": "expert_rating_present",
+              "status": "pass",
+              "detail": "expert RANO rating: PD"
+            }
+          ],
+          "readiness": "usable"
+        }
+      ],
+      "readiness": "usable"
+    },
+    {
+      "patient_id": "Patient-002",
+      "n_timepoints": 7,
+      "n_usable": 6,
+      "n_assessable": 3,
+      "is_longitudinal": true,
+      "timepoints": [
+        {
+          "id": "Patient-002/week-000",
+          "label": "week-000",
+          "week_offset": 0.0,
+          "modalities": {
+            "CT1": {
+              "source": "Imaging/Patient-002/week-000/CT1.nii.gz",
+              "space": "native:Imaging/Patient-002/week-000/CT1.nii.gz",
+              "shape": [
+                256,
+                256,
+                192
+              ],
+              "spacing_mm": [
+                0.8984374788824447,
+                0.8984375106010661,
+                0.9000013620285491
+              ],
+              "anisotropy_ratio": 1.0017,
+              "voxel_mm3": 0.726472
+            },
+            "T1": {
+              "source": "Imaging/Patient-002/week-000/T1.nii.gz",
+              "space": "native:Imaging/Patient-002/week-000/T1.nii.gz",
+              "shape": [
+                448,
+                512,
+                20
+              ],
+              "spacing_mm": [
+                0.41015625136205147,
+                0.4101562662493278,
+                7.19999628262235
+              ],
+              "anisotropy_ratio": 17.5543,
+              "voxel_mm3": 1.211242
+            },
+            "T2": {
+              "source": "Imaging/Patient-002/week-000/T2.nii.gz",
+              "space": "native:Imaging/Patient-002/week-000/T2.nii.gz",
+              "shape": [
+                448,
+                512,
+                20
+              ],
+              "spacing_mm": [
+                0.41015626492986135,
+                0.41015625103236825,
+                7.200000782921318
+              ],
+              "anisotropy_ratio": 17.5543,
+              "voxel_mm3": 1.211243
+            },
+            "FLAIR": {
+              "source": "Imaging/Patient-002/week-000/FLAIR.nii.gz",
+              "space": "native:Imaging/Patient-002/week-000/FLAIR.nii.gz",
+              "shape": [
+                448,
+                512,
+                20
+              ],
+              "spacing_mm": [
+                0.41015626492986135,
+                0.41015625103236825,
+                7.200000782921318
+              ],
+              "anisotropy_ratio": 17.5543,
+              "voxel_mm3": 1.211243
+            }
+          },
+          "mask": {
+            "source": "Imaging/Patient-002/week-000/DeepBraTumIA-segmentation/atlas/segmentation/seg_mask.nii.gz",
+            "space": "mni152_1mm:mni152_1mm",
+            "shape": [
+              182,
+              218,
+              182
+            ],
+            "spacing_mm": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "anisotropy_ratio": 1.0,
+            "voxel_mm3": 1.0
+          },
+          "mask_source": "DeepBraTumIA",
+          "compartment_volumes": {
+            "enhancing": {
+              "volume_mm3": 16887.0,
+              "uncertainty_pp": 5.3,
+              "space": "atlas:mni152_1mm"
+            },
+            "necrosis_nonenhancing": {
+              "volume_mm3": 3620.0,
+              "uncertainty_pp": 14.8,
+              "space": "atlas:mni152_1mm"
+            },
+            "edema": {
+              "volume_mm3": 13863.0,
+              "uncertainty_pp": 5.3,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "region_volumes": {
+            "ET": {
+              "volume_mm3": 16887.0,
+              "uncertainty_pp": 5.3,
+              "space": "atlas:mni152_1mm"
+            },
+            "TC": {
+              "volume_mm3": 20507.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            },
+            "WT": {
+              "volume_mm3": 34370.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "expert_rating": "Pre-Op",
+          "checks": [
+            {
+              "code": "modalities_present",
+              "status": "pass",
+              "detail": "all required modalities present"
+            },
+            {
+              "code": "mask_present",
+              "status": "pass",
+              "detail": "DeepBraTumIA mask resolved"
+            },
+            {
+              "code": "mask_grid_alignment.ok",
+              "status": "pass",
+              "detail": "mask and mask_reference share one grid within tolerance"
+            },
+            {
+              "code": "label_schema_valid",
+              "status": "pass",
+              "detail": "all mask integers are documented in label_schema.py"
+            },
+            {
+              "code": "expert_rating_present",
+              "status": "warn",
+              "detail": "expert RANO rating: Pre-Op"
+            }
+          ],
+          "readiness": "needs_attention"
+        },
+        {
+          "id": "Patient-002/week-003",
+          "label": "week-003",
+          "week_offset": 3.0,
+          "modalities": {
+            "CT1": {
+              "source": "Imaging/Patient-002/week-003/CT1.nii.gz",
+              "space": "native:Imaging/Patient-002/week-003/CT1.nii.gz",
+              "shape": [
+                448,
+                512,
+                24
+              ],
+              "spacing_mm": [
+                0.4296874803347413,
+                0.4296875168612009,
+                5.999999009691467
+              ],
+              "anisotropy_ratio": 13.9636,
+              "voxel_mm3": 1.107788
+            },
+            "T1": {
+              "source": "Imaging/Patient-002/week-003/T1.nii.gz",
+              "space": "native:Imaging/Patient-002/week-003/T1.nii.gz",
+              "shape": [
+                280,
+                320,
+                24
+              ],
+              "spacing_mm": [
+                0.6875000138840952,
+                0.687499999492398,
+                6.000000463782248
+              ],
+              "anisotropy_ratio": 8.7273,
+              "voxel_mm3": 2.835938
+            },
+            "T2": {
+              "source": "Imaging/Patient-002/week-003/T2.nii.gz",
+              "space": "native:Imaging/Patient-002/week-003/T2.nii.gz",
+              "shape": [
+                448,
+                512,
+                24
+              ],
+              "spacing_mm": [
+                0.42968750121184773,
+                0.42968752191562404,
+                6.000000463782248
+              ],
+              "anisotropy_ratio": 13.9636,
+              "voxel_mm3": 1.107788
+            },
+            "FLAIR": {
+              "source": "Imaging/Patient-002/week-003/FLAIR.nii.gz",
+              "space": "native:Imaging/Patient-002/week-003/FLAIR.nii.gz",
+              "shape": [
+                228,
+                256,
+                32
+              ],
+              "spacing_mm": [
+                0.7812499927952598,
+                0.7812500409599231,
+                4.799999259730267
+              ],
+              "anisotropy_ratio": 6.144,
+              "voxel_mm3": 2.929687
+            }
+          },
+          "mask": {
+            "source": "Imaging/Patient-002/week-003/DeepBraTumIA-segmentation/atlas/segmentation/seg_mask.nii.gz",
+            "space": "mni152_1mm:mni152_1mm",
+            "shape": [
+              182,
+              218,
+              182
+            ],
+            "spacing_mm": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "anisotropy_ratio": 1.0,
+            "voxel_mm3": 1.0
+          },
+          "mask_source": "DeepBraTumIA",
+          "compartment_volumes": {
+            "enhancing": {
+              "volume_mm3": 4857.0,
+              "uncertainty_pp": 14.8,
+              "space": "atlas:mni152_1mm"
+            },
+            "necrosis_nonenhancing": {
+              "volume_mm3": 24931.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            },
+            "edema": {
+              "volume_mm3": 43565.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "region_volumes": {
+            "ET": {
+              "volume_mm3": 4857.0,
+              "uncertainty_pp": 14.8,
+              "space": "atlas:mni152_1mm"
+            },
+            "TC": {
+              "volume_mm3": 29788.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            },
+            "WT": {
+              "volume_mm3": 73353.0,
+              "uncertainty_pp": 1.5,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "expert_rating": "Post-Op",
+          "checks": [
+            {
+              "code": "modalities_present",
+              "status": "pass",
+              "detail": "all required modalities present"
+            },
+            {
+              "code": "mask_present",
+              "status": "pass",
+              "detail": "DeepBraTumIA mask resolved"
+            },
+            {
+              "code": "mask_grid_alignment.ok",
+              "status": "pass",
+              "detail": "mask and mask_reference share one grid within tolerance"
+            },
+            {
+              "code": "label_schema_valid",
+              "status": "pass",
+              "detail": "all mask integers are documented in label_schema.py"
+            },
+            {
+              "code": "expert_rating_present",
+              "status": "warn",
+              "detail": "expert RANO rating: Post-Op"
+            }
+          ],
+          "readiness": "needs_attention"
+        },
+        {
+          "id": "Patient-002/week-021",
+          "label": "week-021",
+          "week_offset": 21.0,
+          "modalities": {
+            "CT1": {
+              "source": "Imaging/Patient-002/week-021/CT1.nii.gz",
+              "space": "native:Imaging/Patient-002/week-021/CT1.nii.gz",
+              "shape": [
+                256,
+                256,
+                176
+              ],
+              "spacing_mm": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "anisotropy_ratio": 1.0,
+              "voxel_mm3": 1.0
+            },
+            "T1": {
+              "source": "Imaging/Patient-002/week-021/T1.nii.gz",
+              "space": "native:Imaging/Patient-002/week-021/T1.nii.gz",
+              "shape": [
+                448,
+                512,
+                24
+              ],
+              "spacing_mm": [
+                0.429687527731001,
+                0.4296875198929104,
+                6.000003150993262
+              ],
+              "anisotropy_ratio": 13.9636,
+              "voxel_mm3": 1.107789
+            },
+            "T2": {
+              "source": "Imaging/Patient-002/week-021/T2.nii.gz",
+              "space": "native:Imaging/Patient-002/week-021/T2.nii.gz",
+              "shape": [
+                448,
+                512,
+                24
+              ],
+              "spacing_mm": [
+                0.429687527731001,
+                0.4296875198929104,
+                6.000003150993262
+              ],
+              "anisotropy_ratio": 13.9636,
+              "voxel_mm3": 1.107789
+            },
+            "FLAIR": {
+              "source": "Imaging/Patient-002/week-021/FLAIR.nii.gz",
+              "space": "native:Imaging/Patient-002/week-021/FLAIR.nii.gz",
+              "shape": [
+                372,
+                448,
+                42
+              ],
+              "spacing_mm": [
+                0.49107142415788185,
+                0.4910714251473594,
+                3.300004037574431
+              ],
+              "anisotropy_ratio": 6.72,
+              "voxel_mm3": 0.7958
+            }
+          },
+          "mask": {
+            "source": "Imaging/Patient-002/week-021/DeepBraTumIA-segmentation/atlas/segmentation/seg_mask.nii.gz",
+            "space": "mni152_1mm:mni152_1mm",
+            "shape": [
+              182,
+              218,
+              182
+            ],
+            "spacing_mm": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "anisotropy_ratio": 1.0,
+            "voxel_mm3": 1.0
+          },
+          "mask_source": "DeepBraTumIA",
+          "compartment_volumes": {
+            "enhancing": {
+              "volume_mm3": 0.0,
+              "uncertainty_pp": 36.6,
+              "space": "atlas:mni152_1mm"
+            },
+            "necrosis_nonenhancing": {
+              "volume_mm3": 982.0,
+              "uncertainty_pp": 36.6,
+              "space": "atlas:mni152_1mm"
+            },
+            "edema": {
+              "volume_mm3": 11261.0,
+              "uncertainty_pp": 5.3,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "region_volumes": {
+            "ET": {
+              "volume_mm3": 0.0,
+              "uncertainty_pp": 36.6,
+              "space": "atlas:mni152_1mm"
+            },
+            "TC": {
+              "volume_mm3": 982.0,
+              "uncertainty_pp": 36.6,
+              "space": "atlas:mni152_1mm"
+            },
+            "WT": {
+              "volume_mm3": 12243.0,
+              "uncertainty_pp": 5.3,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "expert_rating": "SD",
+          "checks": [
+            {
+              "code": "modalities_present",
+              "status": "pass",
+              "detail": "all required modalities present"
+            },
+            {
+              "code": "mask_present",
+              "status": "pass",
+              "detail": "DeepBraTumIA mask resolved"
+            },
+            {
+              "code": "mask_grid_alignment.ok",
+              "status": "pass",
+              "detail": "mask and mask_reference share one grid within tolerance"
+            },
+            {
+              "code": "label_schema_valid",
+              "status": "pass",
+              "detail": "all mask integers are documented in label_schema.py"
+            },
+            {
+              "code": "expert_rating_present",
+              "status": "pass",
+              "detail": "expert RANO rating: SD"
+            }
+          ],
+          "readiness": "usable"
+        },
+        {
+          "id": "Patient-002/week-037",
+          "label": "week-037",
+          "week_offset": 37.0,
+          "modalities": {
+            "CT1": {
+              "source": "Imaging/Patient-002/week-037/CT1.nii.gz",
+              "space": "native:Imaging/Patient-002/week-037/CT1.nii.gz",
+              "shape": [
+                448,
+                512,
+                24
+              ],
+              "spacing_mm": [
+                0.4296875163693704,
+                0.42968751025339885,
+                5.999999016716051
+              ],
+              "anisotropy_ratio": 13.9636,
+              "voxel_mm3": 1.107788
+            },
+            "T1": {
+              "source": "Imaging/Patient-002/week-037/T1.nii.gz",
+              "space": "native:Imaging/Patient-002/week-037/T1.nii.gz",
+              "shape": [
+                280,
+                320,
+                24
+              ],
+              "spacing_mm": [
+                0.6874999765784499,
+                0.687500009975393,
+                6.000000457377221
+              ],
+              "anisotropy_ratio": 8.7273,
+              "voxel_mm3": 2.835938
+            },
+            "T2": {
+              "source": "Imaging/Patient-002/week-037/T2.nii.gz",
+              "space": "native:Imaging/Patient-002/week-037/T2.nii.gz",
+              "shape": [
+                448,
+                512,
+                24
+              ],
+              "spacing_mm": [
+                0.42968749281564145,
+                0.42968748391991773,
+                6.000000457377221
+              ],
+              "anisotropy_ratio": 13.9636,
+              "voxel_mm3": 1.107788
+            },
+            "FLAIR": {
+              "source": "Imaging/Patient-002/week-037/FLAIR.nii.gz",
+              "space": "native:Imaging/Patient-002/week-037/FLAIR.nii.gz",
+              "shape": [
+                228,
+                256,
+                32
+              ],
+              "spacing_mm": [
+                0.7812500358616523,
+                0.7812499850345925,
+                4.7999973212612135
+              ],
+              "anisotropy_ratio": 6.144,
+              "voxel_mm3": 2.929686
+            }
+          },
+          "mask": {
+            "source": "Imaging/Patient-002/week-037/DeepBraTumIA-segmentation/atlas/segmentation/seg_mask.nii.gz",
+            "space": "mni152_1mm:mni152_1mm",
+            "shape": [
+              182,
+              218,
+              182
+            ],
+            "spacing_mm": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "anisotropy_ratio": 1.0,
+            "voxel_mm3": 1.0
+          },
+          "mask_source": "DeepBraTumIA",
+          "compartment_volumes": {
+            "enhancing": {
+              "volume_mm3": 5928.0,
+              "uncertainty_pp": 5.3,
+              "space": "atlas:mni152_1mm"
+            },
+            "necrosis_nonenhancing": {
+              "volume_mm3": 70.0,
+              "uncertainty_pp": 36.6,
+              "space": "atlas:mni152_1mm"
+            },
+            "edema": {
+              "volume_mm3": 44200.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "region_volumes": {
+            "ET": {
+              "volume_mm3": 5928.0,
+              "uncertainty_pp": 5.3,
+              "space": "atlas:mni152_1mm"
+            },
+            "TC": {
+              "volume_mm3": 5998.0,
+              "uncertainty_pp": 5.3,
+              "space": "atlas:mni152_1mm"
+            },
+            "WT": {
+              "volume_mm3": 50198.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "expert_rating": "PD",
+          "checks": [
+            {
+              "code": "modalities_present",
+              "status": "pass",
+              "detail": "all required modalities present"
+            },
+            {
+              "code": "mask_present",
+              "status": "pass",
+              "detail": "DeepBraTumIA mask resolved"
+            },
+            {
+              "code": "mask_grid_alignment.ok",
+              "status": "pass",
+              "detail": "mask and mask_reference share one grid within tolerance"
+            },
+            {
+              "code": "label_schema_valid",
+              "status": "pass",
+              "detail": "all mask integers are documented in label_schema.py"
+            },
+            {
+              "code": "expert_rating_present",
+              "status": "pass",
+              "detail": "expert RANO rating: PD"
+            }
+          ],
+          "readiness": "usable"
+        },
+        {
+          "id": "Patient-002/week-040-1",
+          "label": "week-040-1",
+          "week_offset": 40.0,
+          "modalities": {
+            "CT1": {
+              "source": "Imaging/Patient-002/week-040-1/CT1.nii.gz",
+              "space": "native:Imaging/Patient-002/week-040-1/CT1.nii.gz",
+              "shape": [
+                256,
+                256,
+                192
+              ],
+              "spacing_mm": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "anisotropy_ratio": 1.0,
+              "voxel_mm3": 1.0
+            }
+          },
+          "mask": null,
+          "mask_source": null,
+          "compartment_volumes": {},
+          "region_volumes": {},
+          "expert_rating": null,
+          "checks": [
+            {
+              "code": "modalities_present",
+              "status": "fail",
+              "detail": "missing required: FLAIR"
+            },
+            {
+              "code": "mask_present",
+              "status": "fail",
+              "detail": "no canonical mask resolved for this timepoint"
+            }
+          ],
+          "readiness": "unusable"
+        },
+        {
+          "id": "Patient-002/week-040-2",
+          "label": "week-040-2",
+          "week_offset": 40.0,
+          "modalities": {
+            "CT1": {
+              "source": "Imaging/Patient-002/week-040-2/CT1.nii.gz",
+              "space": "native:Imaging/Patient-002/week-040-2/CT1.nii.gz",
+              "shape": [
+                256,
+                256,
+                160
+              ],
+              "spacing_mm": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "anisotropy_ratio": 1.0,
+              "voxel_mm3": 1.0
+            },
+            "T1": {
+              "source": "Imaging/Patient-002/week-040-2/T1.nii.gz",
+              "space": "native:Imaging/Patient-002/week-040-2/T1.nii.gz",
+              "shape": [
+                324,
+                384,
+                24
+              ],
+              "spacing_mm": [
+                0.5729166865348816,
+                0.5729166904774792,
+                6.00000545591803
+              ],
+              "anisotropy_ratio": 10.4727,
+              "voxel_mm3": 1.969403
+            },
+            "T2": {
+              "source": "Imaging/Patient-002/week-040-2/T2.nii.gz",
+              "space": "native:Imaging/Patient-002/week-040-2/T2.nii.gz",
+              "shape": [
+                446,
+                512,
+                24
+              ],
+              "spacing_mm": [
+                0.4296875,
+                0.42968751799128374,
+                6.00000545804882
+              ],
+              "anisotropy_ratio": 13.9636,
+              "voxel_mm3": 1.107789
+            },
+            "FLAIR": {
+              "source": "Imaging/Patient-002/week-040-2/FLAIR.nii.gz",
+              "space": "native:Imaging/Patient-002/week-040-2/FLAIR.nii.gz",
+              "shape": [
+                280,
+                320,
+                38
+              ],
+              "spacing_mm": [
+                0.6874999743631667,
+                0.6875000497625161,
+                4.799997375454065
+              ],
+              "anisotropy_ratio": 6.9818,
+              "voxel_mm3": 2.268749
+            }
+          },
+          "mask": {
+            "source": "Imaging/Patient-002/week-040-2/DeepBraTumIA-segmentation/atlas/segmentation/seg_mask.nii.gz",
+            "space": "mni152_1mm:mni152_1mm",
+            "shape": [
+              182,
+              218,
+              182
+            ],
+            "spacing_mm": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "anisotropy_ratio": 1.0,
+            "voxel_mm3": 1.0
+          },
+          "mask_source": "DeepBraTumIA",
+          "compartment_volumes": {
+            "enhancing": {
+              "volume_mm3": 32.0,
+              "uncertainty_pp": 36.6,
+              "space": "atlas:mni152_1mm"
+            },
+            "necrosis_nonenhancing": {
+              "volume_mm3": 3177.0,
+              "uncertainty_pp": 14.8,
+              "space": "atlas:mni152_1mm"
+            },
+            "edema": {
+              "volume_mm3": 24728.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "region_volumes": {
+            "ET": {
+              "volume_mm3": 32.0,
+              "uncertainty_pp": 36.6,
+              "space": "atlas:mni152_1mm"
+            },
+            "TC": {
+              "volume_mm3": 3209.0,
+              "uncertainty_pp": 14.8,
+              "space": "atlas:mni152_1mm"
+            },
+            "WT": {
+              "volume_mm3": 27937.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "expert_rating": "Post-Op",
+          "checks": [
+            {
+              "code": "modalities_present",
+              "status": "pass",
+              "detail": "all required modalities present"
+            },
+            {
+              "code": "mask_present",
+              "status": "pass",
+              "detail": "DeepBraTumIA mask resolved"
+            },
+            {
+              "code": "mask_grid_alignment.ok",
+              "status": "pass",
+              "detail": "mask and mask_reference share one grid within tolerance"
+            },
+            {
+              "code": "label_schema_valid",
+              "status": "pass",
+              "detail": "all mask integers are documented in label_schema.py"
+            },
+            {
+              "code": "expert_rating_present",
+              "status": "warn",
+              "detail": "expert RANO rating: Post-Op"
+            }
+          ],
+          "readiness": "needs_attention"
+        },
+        {
+          "id": "Patient-002/week-047",
+          "label": "week-047",
+          "week_offset": 47.0,
+          "modalities": {
+            "CT1": {
+              "source": "Imaging/Patient-002/week-047/CT1.nii.gz",
+              "space": "native:Imaging/Patient-002/week-047/CT1.nii.gz",
+              "shape": [
+                256,
+                256,
+                176
+              ],
+              "spacing_mm": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "anisotropy_ratio": 1.0,
+              "voxel_mm3": 1.0
+            },
+            "T1": {
+              "source": "Imaging/Patient-002/week-047/T1.nii.gz",
+              "space": "native:Imaging/Patient-002/week-047/T1.nii.gz",
+              "shape": [
+                448,
+                512,
+                24
+              ],
+              "spacing_mm": [
+                0.429687481999968,
+                0.4296874683273748,
+                6.0000022713355925
+              ],
+              "anisotropy_ratio": 13.9636,
+              "voxel_mm3": 1.107788
+            },
+            "T2": {
+              "source": "Imaging/Patient-002/week-047/T2.nii.gz",
+              "space": "native:Imaging/Patient-002/week-047/T2.nii.gz",
+              "shape": [
+                448,
+                512,
+                24
+              ],
+              "spacing_mm": [
+                0.429687481999968,
+                0.4296874683273748,
+                6.0000022713355925
+              ],
+              "anisotropy_ratio": 13.9636,
+              "voxel_mm3": 1.107788
+            },
+            "FLAIR": {
+              "source": "Imaging/Patient-002/week-047/FLAIR.nii.gz",
+              "space": "native:Imaging/Patient-002/week-047/FLAIR.nii.gz",
+              "shape": [
+                372,
+                448,
+                42
+              ],
+              "spacing_mm": [
+                0.491071439248884,
+                0.4910714375922248,
+                3.300000785410648
+              ],
+              "anisotropy_ratio": 6.72,
+              "voxel_mm3": 0.795799
+            }
+          },
+          "mask": {
+            "source": "Imaging/Patient-002/week-047/DeepBraTumIA-segmentation/atlas/segmentation/seg_mask.nii.gz",
+            "space": "mni152_1mm:mni152_1mm",
+            "shape": [
+              182,
+              218,
+              182
+            ],
+            "spacing_mm": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "anisotropy_ratio": 1.0,
+            "voxel_mm3": 1.0
+          },
+          "mask_source": "DeepBraTumIA",
+          "compartment_volumes": {
+            "enhancing": {
+              "volume_mm3": 28080.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            },
+            "necrosis_nonenhancing": {
+              "volume_mm3": 9135.0,
+              "uncertainty_pp": 5.3,
+              "space": "atlas:mni152_1mm"
+            },
+            "edema": {
+              "volume_mm3": 20355.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "region_volumes": {
+            "ET": {
+              "volume_mm3": 28080.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            },
+            "TC": {
+              "volume_mm3": 37215.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            },
+            "WT": {
+              "volume_mm3": 57570.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "expert_rating": "PD",
+          "checks": [
+            {
+              "code": "modalities_present",
+              "status": "pass",
+              "detail": "all required modalities present"
+            },
+            {
+              "code": "mask_present",
+              "status": "pass",
+              "detail": "DeepBraTumIA mask resolved"
+            },
+            {
+              "code": "mask_grid_alignment.ok",
+              "status": "pass",
+              "detail": "mask and mask_reference share one grid within tolerance"
+            },
+            {
+              "code": "label_schema_valid",
+              "status": "pass",
+              "detail": "all mask integers are documented in label_schema.py"
+            },
+            {
+              "code": "expert_rating_present",
+              "status": "pass",
+              "detail": "expert RANO rating: PD"
+            }
+          ],
+          "readiness": "usable"
+        }
+      ],
+      "readiness": "usable"
+    },
+    {
+      "patient_id": "Patient-003",
+      "n_timepoints": 5,
+      "n_usable": 4,
+      "n_assessable": 3,
+      "is_longitudinal": true,
+      "timepoints": [
+        {
+          "id": "Patient-003/week-000-1",
+          "label": "week-000-1",
+          "week_offset": 0.0,
+          "modalities": {
+            "CT1": {
+              "source": "Imaging/Patient-003/week-000-1/CT1.nii.gz",
+              "space": "native:Imaging/Patient-003/week-000-1/CT1.nii.gz",
+              "shape": [
+                512,
+                512,
+                140
+              ],
+              "spacing_mm": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "anisotropy_ratio": 1.0,
+              "voxel_mm3": 1.0
+            },
+            "T2": {
+              "source": "Imaging/Patient-003/week-000-1/T2.nii.gz",
+              "space": "native:Imaging/Patient-003/week-000-1/T2.nii.gz",
+              "shape": [
+                512,
+                512,
+                176
+              ],
+              "spacing_mm": [
+                0.501953125,
+                0.501953125,
+                1.0
+              ],
+              "anisotropy_ratio": 1.9922,
+              "voxel_mm3": 0.251957
+            }
+          },
+          "mask": null,
+          "mask_source": null,
+          "compartment_volumes": {},
+          "region_volumes": {},
+          "expert_rating": "Pre-Op",
+          "checks": [
+            {
+              "code": "modalities_present",
+              "status": "fail",
+              "detail": "missing required: FLAIR"
+            },
+            {
+              "code": "mask_present",
+              "status": "fail",
+              "detail": "no canonical mask resolved for this timepoint"
+            }
+          ],
+          "readiness": "unusable"
+        },
+        {
+          "id": "Patient-003/week-000-2",
+          "label": "week-000-2",
+          "week_offset": 0.0,
+          "modalities": {
+            "CT1": {
+              "source": "Imaging/Patient-003/week-000-2/CT1.nii.gz",
+              "space": "native:Imaging/Patient-003/week-000-2/CT1.nii.gz",
+              "shape": [
+                256,
+                256,
+                160
+              ],
+              "spacing_mm": [
+                0.9999999764959643,
+                1.0000000027041251,
+                1.0000113083130187
+              ],
+              "anisotropy_ratio": 1.0,
+              "voxel_mm3": 1.000011
+            },
+            "T1": {
+              "source": "Imaging/Patient-003/week-000-2/T1.nii.gz",
+              "space": "native:Imaging/Patient-003/week-000-2/T1.nii.gz",
+              "shape": [
+                280,
+                320,
+                24
+              ],
+              "spacing_mm": [
+                0.6874999691965483,
+                0.6874999584710362,
+                5.9999986839574095
+              ],
+              "anisotropy_ratio": 8.7273,
+              "voxel_mm3": 2.835937
+            },
+            "T2": {
+              "source": "Imaging/Patient-003/week-000-2/T2.nii.gz",
+              "space": "native:Imaging/Patient-003/week-000-2/T2.nii.gz",
+              "shape": [
+                390,
+                448,
+                24
+              ],
+              "spacing_mm": [
+                0.4910714043478722,
+                0.49107139020383694,
+                5.999997726817437
+              ],
+              "anisotropy_ratio": 12.2182,
+              "voxel_mm3": 1.446906
+            },
+            "FLAIR": {
+              "source": "Imaging/Patient-003/week-000-2/FLAIR.nii.gz",
+              "space": "native:Imaging/Patient-003/week-000-2/FLAIR.nii.gz",
+              "shape": [
+                448,
+                512,
+                38
+              ],
+              "spacing_mm": [
+                0.4296874987870512,
+                0.42968750982704146,
+                4.80000198835756
+              ],
+              "anisotropy_ratio": 11.1709,
+              "voxel_mm3": 0.886231
+            }
+          },
+          "mask": {
+            "source": "Imaging/Patient-003/week-000-2/DeepBraTumIA-segmentation/atlas/segmentation/seg_mask.nii.gz",
+            "space": "mni152_1mm:mni152_1mm",
+            "shape": [
+              182,
+              218,
+              182
+            ],
+            "spacing_mm": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "anisotropy_ratio": 1.0,
+            "voxel_mm3": 1.0
+          },
+          "mask_source": "DeepBraTumIA",
+          "compartment_volumes": {
+            "enhancing": {
+              "volume_mm3": 15418.0,
+              "uncertainty_pp": 5.3,
+              "space": "atlas:mni152_1mm"
+            },
+            "necrosis_nonenhancing": {
+              "volume_mm3": 51297.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            },
+            "edema": {
+              "volume_mm3": 59458.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "region_volumes": {
+            "ET": {
+              "volume_mm3": 15418.0,
+              "uncertainty_pp": 5.3,
+              "space": "atlas:mni152_1mm"
+            },
+            "TC": {
+              "volume_mm3": 66715.0,
+              "uncertainty_pp": 1.5,
+              "space": "atlas:mni152_1mm"
+            },
+            "WT": {
+              "volume_mm3": 126173.0,
+              "uncertainty_pp": 1.5,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "expert_rating": "Post-Op",
+          "checks": [
+            {
+              "code": "modalities_present",
+              "status": "pass",
+              "detail": "all required modalities present"
+            },
+            {
+              "code": "mask_present",
+              "status": "pass",
+              "detail": "DeepBraTumIA mask resolved"
+            },
+            {
+              "code": "mask_grid_alignment.ok",
+              "status": "pass",
+              "detail": "mask and mask_reference share one grid within tolerance"
+            },
+            {
+              "code": "label_schema_valid",
+              "status": "pass",
+              "detail": "all mask integers are documented in label_schema.py"
+            },
+            {
+              "code": "expert_rating_present",
+              "status": "warn",
+              "detail": "expert RANO rating: Post-Op"
+            }
+          ],
+          "readiness": "needs_attention"
+        },
+        {
+          "id": "Patient-003/week-014",
+          "label": "week-014",
+          "week_offset": 14.0,
+          "modalities": {
+            "CT1": {
+              "source": "Imaging/Patient-003/week-014/CT1.nii.gz",
+              "space": "native:Imaging/Patient-003/week-014/CT1.nii.gz",
+              "shape": [
+                256,
+                256,
+                160
+              ],
+              "spacing_mm": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "anisotropy_ratio": 1.0,
+              "voxel_mm3": 1.0
+            },
+            "T1": {
+              "source": "Imaging/Patient-003/week-014/T1.nii.gz",
+              "space": "native:Imaging/Patient-003/week-014/T1.nii.gz",
+              "shape": [
+                280,
+                320,
+                24
+              ],
+              "spacing_mm": [
+                0.6875000184141149,
+                0.6874999887430212,
+                5.999999338212902
+              ],
+              "anisotropy_ratio": 8.7273,
+              "voxel_mm3": 2.835937
+            },
+            "T2": {
+              "source": "Imaging/Patient-003/week-014/T2.nii.gz",
+              "space": "native:Imaging/Patient-003/week-014/T2.nii.gz",
+              "shape": [
+                390,
+                448,
+                24
+              ],
+              "spacing_mm": [
+                0.4910714119115741,
+                0.4910714075821644,
+                6.000003199450931
+              ],
+              "anisotropy_ratio": 12.2182,
+              "voxel_mm3": 1.446908
+            },
+            "FLAIR": {
+              "source": "Imaging/Patient-003/week-014/FLAIR.nii.gz",
+              "space": "native:Imaging/Patient-003/week-014/FLAIR.nii.gz",
+              "shape": [
+                448,
+                512,
+                38
+              ],
+              "spacing_mm": [
+                0.4296874821471502,
+                0.4296875022465723,
+                4.7999985619652445
+              ],
+              "anisotropy_ratio": 11.1709,
+              "voxel_mm3": 0.88623
+            }
+          },
+          "mask": {
+            "source": "Imaging/Patient-003/week-014/DeepBraTumIA-segmentation/atlas/segmentation/seg_mask.nii.gz",
+            "space": "mni152_1mm:mni152_1mm",
+            "shape": [
+              182,
+              218,
+              182
+            ],
+            "spacing_mm": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "anisotropy_ratio": 1.0,
+            "voxel_mm3": 1.0
+          },
+          "mask_source": "DeepBraTumIA",
+          "compartment_volumes": {
+            "enhancing": {
+              "volume_mm3": 59.0,
+              "uncertainty_pp": 36.6,
+              "space": "atlas:mni152_1mm"
+            },
+            "necrosis_nonenhancing": {
+              "volume_mm3": 13182.0,
+              "uncertainty_pp": 5.3,
+              "space": "atlas:mni152_1mm"
+            },
+            "edema": {
+              "volume_mm3": 17139.0,
+              "uncertainty_pp": 5.3,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "region_volumes": {
+            "ET": {
+              "volume_mm3": 59.0,
+              "uncertainty_pp": 36.6,
+              "space": "atlas:mni152_1mm"
+            },
+            "TC": {
+              "volume_mm3": 13241.0,
+              "uncertainty_pp": 5.3,
+              "space": "atlas:mni152_1mm"
+            },
+            "WT": {
+              "volume_mm3": 30380.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "expert_rating": "SD",
+          "checks": [
+            {
+              "code": "modalities_present",
+              "status": "pass",
+              "detail": "all required modalities present"
+            },
+            {
+              "code": "mask_present",
+              "status": "pass",
+              "detail": "DeepBraTumIA mask resolved"
+            },
+            {
+              "code": "mask_grid_alignment.ok",
+              "status": "pass",
+              "detail": "mask and mask_reference share one grid within tolerance"
+            },
+            {
+              "code": "label_schema_valid",
+              "status": "pass",
+              "detail": "all mask integers are documented in label_schema.py"
+            },
+            {
+              "code": "expert_rating_present",
+              "status": "pass",
+              "detail": "expert RANO rating: SD"
+            }
+          ],
+          "readiness": "usable"
+        },
+        {
+          "id": "Patient-003/week-027",
+          "label": "week-027",
+          "week_offset": 27.0,
+          "modalities": {
+            "CT1": {
+              "source": "Imaging/Patient-003/week-027/CT1.nii.gz",
+              "space": "native:Imaging/Patient-003/week-027/CT1.nii.gz",
+              "shape": [
+                256,
+                256,
+                160
+              ],
+              "spacing_mm": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "anisotropy_ratio": 1.0,
+              "voxel_mm3": 1.0
+            },
+            "T1": {
+              "source": "Imaging/Patient-003/week-027/T1.nii.gz",
+              "space": "native:Imaging/Patient-003/week-027/T1.nii.gz",
+              "shape": [
+                280,
+                320,
+                24
+              ],
+              "spacing_mm": [
+                0.6874999751028283,
+                0.6875000284103537,
+                6.000001558076658
+              ],
+              "anisotropy_ratio": 8.7273,
+              "voxel_mm3": 2.835938
+            },
+            "T2": {
+              "source": "Imaging/Patient-003/week-027/T2.nii.gz",
+              "space": "native:Imaging/Patient-003/week-027/T2.nii.gz",
+              "shape": [
+                390,
+                448,
+                24
+              ],
+              "spacing_mm": [
+                0.4910714065119346,
+                0.49107140973235297,
+                5.999999558922586
+              ],
+              "anisotropy_ratio": 12.2182,
+              "voxel_mm3": 1.446907
+            },
+            "FLAIR": {
+              "source": "Imaging/Patient-003/week-027/FLAIR.nii.gz",
+              "space": "native:Imaging/Patient-003/week-027/FLAIR.nii.gz",
+              "shape": [
+                448,
+                512,
+                38
+              ],
+              "spacing_mm": [
+                0.4296874986855397,
+                0.42968750432906233,
+                4.79999565538659
+              ],
+              "anisotropy_ratio": 11.1709,
+              "voxel_mm3": 0.88623
+            }
+          },
+          "mask": {
+            "source": "Imaging/Patient-003/week-027/DeepBraTumIA-segmentation/atlas/segmentation/seg_mask.nii.gz",
+            "space": "mni152_1mm:mni152_1mm",
+            "shape": [
+              182,
+              218,
+              182
+            ],
+            "spacing_mm": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "anisotropy_ratio": 1.0,
+            "voxel_mm3": 1.0
+          },
+          "mask_source": "DeepBraTumIA",
+          "compartment_volumes": {
+            "enhancing": {
+              "volume_mm3": 0.0,
+              "uncertainty_pp": 36.6,
+              "space": "atlas:mni152_1mm"
+            },
+            "necrosis_nonenhancing": {
+              "volume_mm3": 21711.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            },
+            "edema": {
+              "volume_mm3": 17290.0,
+              "uncertainty_pp": 5.3,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "region_volumes": {
+            "ET": {
+              "volume_mm3": 0.0,
+              "uncertainty_pp": 36.6,
+              "space": "atlas:mni152_1mm"
+            },
+            "TC": {
+              "volume_mm3": 21711.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            },
+            "WT": {
+              "volume_mm3": 39001.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "expert_rating": "PD",
+          "checks": [
+            {
+              "code": "modalities_present",
+              "status": "pass",
+              "detail": "all required modalities present"
+            },
+            {
+              "code": "mask_present",
+              "status": "pass",
+              "detail": "DeepBraTumIA mask resolved"
+            },
+            {
+              "code": "mask_grid_alignment.ok",
+              "status": "pass",
+              "detail": "mask and mask_reference share one grid within tolerance"
+            },
+            {
+              "code": "label_schema_valid",
+              "status": "pass",
+              "detail": "all mask integers are documented in label_schema.py"
+            },
+            {
+              "code": "expert_rating_present",
+              "status": "pass",
+              "detail": "expert RANO rating: PD"
+            }
+          ],
+          "readiness": "usable"
+        },
+        {
+          "id": "Patient-003/week-038",
+          "label": "week-038",
+          "week_offset": 38.0,
+          "modalities": {
+            "CT1": {
+              "source": "Imaging/Patient-003/week-038/CT1.nii.gz",
+              "space": "native:Imaging/Patient-003/week-038/CT1.nii.gz",
+              "shape": [
+                256,
+                256,
+                176
+              ],
+              "spacing_mm": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "anisotropy_ratio": 1.0,
+              "voxel_mm3": 1.0
+            },
+            "T1": {
+              "source": "Imaging/Patient-003/week-038/T1.nii.gz",
+              "space": "native:Imaging/Patient-003/week-038/T1.nii.gz",
+              "shape": [
+                448,
+                512,
+                24
+              ],
+              "spacing_mm": [
+                0.42968747022019826,
+                0.4296875087127595,
+                6.000001196338451
+              ],
+              "anisotropy_ratio": 13.9636,
+              "voxel_mm3": 1.107788
+            },
+            "T2": {
+              "source": "Imaging/Patient-003/week-038/T2.nii.gz",
+              "space": "native:Imaging/Patient-003/week-038/T2.nii.gz",
+              "shape": [
+                448,
+                512,
+                24
+              ],
+              "spacing_mm": [
+                0.42968747022019826,
+                0.4296875087127595,
+                6.000001196338451
+              ],
+              "anisotropy_ratio": 13.9636,
+              "voxel_mm3": 1.107788
+            },
+            "FLAIR": {
+              "source": "Imaging/Patient-003/week-038/FLAIR.nii.gz",
+              "space": "native:Imaging/Patient-003/week-038/FLAIR.nii.gz",
+              "shape": [
+                372,
+                448,
+                36
+              ],
+              "spacing_mm": [
+                0.4910714081776691,
+                0.49107143476091775,
+                4.39999875158094
+              ],
+              "anisotropy_ratio": 8.96,
+              "voxel_mm3": 1.061065
+            }
+          },
+          "mask": {
+            "source": "Imaging/Patient-003/week-038/DeepBraTumIA-segmentation/atlas/segmentation/seg_mask.nii.gz",
+            "space": "mni152_1mm:mni152_1mm",
+            "shape": [
+              182,
+              218,
+              182
+            ],
+            "spacing_mm": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "anisotropy_ratio": 1.0,
+            "voxel_mm3": 1.0
+          },
+          "mask_source": "DeepBraTumIA",
+          "compartment_volumes": {
+            "enhancing": {
+              "volume_mm3": 31454.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            },
+            "necrosis_nonenhancing": {
+              "volume_mm3": 8975.0,
+              "uncertainty_pp": 5.3,
+              "space": "atlas:mni152_1mm"
+            },
+            "edema": {
+              "volume_mm3": 88214.0,
+              "uncertainty_pp": 1.5,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "region_volumes": {
+            "ET": {
+              "volume_mm3": 31454.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            },
+            "TC": {
+              "volume_mm3": 40429.0,
+              "uncertainty_pp": 2.8,
+              "space": "atlas:mni152_1mm"
+            },
+            "WT": {
+              "volume_mm3": 128643.0,
+              "uncertainty_pp": 1.5,
+              "space": "atlas:mni152_1mm"
+            }
+          },
+          "expert_rating": "PD",
+          "checks": [
+            {
+              "code": "modalities_present",
+              "status": "pass",
+              "detail": "all required modalities present"
+            },
+            {
+              "code": "mask_present",
+              "status": "pass",
+              "detail": "DeepBraTumIA mask resolved"
+            },
+            {
+              "code": "mask_grid_alignment.ok",
+              "status": "pass",
+              "detail": "mask and mask_reference share one grid within tolerance"
+            },
+            {
+              "code": "label_schema_valid",
+              "status": "pass",
+              "detail": "all mask integers are documented in label_schema.py"
+            },
+            {
+              "code": "expert_rating_present",
+              "status": "pass",
+              "detail": "expert RANO rating: PD"
+            }
+          ],
+          "readiness": "usable"
+        }
+      ],
+      "readiness": "usable"
+    }
+  ]
+}
