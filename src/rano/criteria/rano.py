@@ -212,6 +212,13 @@ def _confirm(
 
     The confirming scan is the FIRST one far enough out, not the best one -- picking the most
     favourable later scan would let a response be confirmed by a rebound.
+
+    THREE OUTCOMES, NOT TWO. A response is confirmed, refuted, or UNCONFIRMABLE, and the third is
+    not the second. Two things make a response unconfirmable: no later scan at all
+    (``confirm_at_end_of_followup``), and the nearest later scan being so far out that it describes
+    a different phase of the disease (``confirmation_max_weeks``). Neither is evidence the response
+    failed to hold, so neither demotes the call -- both keep it and record the gap in ``unknowns``.
+    Reading "no confirming scan" as "not confirmed" turns a follow-up schedule into a finding.
     """
     if not criteria.require_confirmation:
         return assessments
@@ -234,6 +241,21 @@ def _confirm(
             ),
             None,
         )
+        # ``j`` is the EARLIEST admissible scan, so if it is already past the upper limit every
+        # later one is too -- there is no candidate to search for, and no demotion to justify.
+        if j is not None and criteria.confirmation_max_weeks is not None:
+            gap = measurements[j].week - week
+            if gap > criteria.confirmation_max_weeks:
+                out[i] = replace(
+                    a,
+                    reason=(
+                        f"{a.reason}; unconfirmable -- nearest later scan is "
+                        f"{measurements[j].timepoint} at +{gap:g} wk "
+                        f"(> {criteria.confirmation_max_weeks:g} wk, too late to confirm)"
+                    ),
+                    unknowns=tuple(sorted({*a.unknowns, "confirmation_too_late"})),
+                )
+                continue
         if j is None:
             if criteria.confirm_at_end_of_followup:
                 out[i] = replace(a, unknowns=tuple(sorted({*a.unknowns, "confirmation_followup"})))
