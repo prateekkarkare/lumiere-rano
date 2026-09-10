@@ -2,10 +2,26 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "rano-report-preview",
+      "name": "mask-browser",
       "runtimeExecutable": ".venv/bin/python",
-      "runtimeArgs": ["-m", "http.server", "8931", "--directory", "output/rano_calls"],
-      "port": 8931
+      "runtimeArgs": [
+        "scripts/mask_browser.py",
+        "--port",
+        "8760"
+      ],
+      "port": 8760
+    },
+    {
+      "name": "docs",
+      "runtimeExecutable": ".venv/bin/python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8761",
+        "--directory",
+        "docs"
+      ],
+      "port": 8761
     }
   ]
 }

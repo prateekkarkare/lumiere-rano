@@ -1,0 +1,159 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LUMIERE — Lesion Splitting Decision</title><style>:root{--bg:#f7f7f5;--panel:#fff;--strip:#f2f2ef;--grid:#e6e6e1;--ink-1:#1a1a18;
+--ink-2:#3d3d39;--ink-3:#6b6b64;--ink-4:#9a9a92;--line:#e2e2dc;--accent:#b5533a;
+--warn-bg:#fdf4ec;--warn-br:#e8b58a;--ok-bg:#f0f4ee;--ok-br:#b9c9ac;}
+@media (prefers-color-scheme:dark){:root{--bg:#14140f;--panel:#1c1c18;--strip:#232320;
+--grid:#2f2f2a;--ink-1:#f0efe9;--ink-2:#d2d1c9;--ink-3:#9a998f;--ink-4:#6e6d64;--line:#2f2f2a;
+--accent:#e0876a;--warn-bg:#2a1f16;--warn-br:#6b4a2e;--ok-bg:#1b2318;--ok-br:#3f5433;}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink-1);
+font:15px/1.6 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif;}
+.wrap{max-width:1080px;margin:0 auto;padding:44px 22px 90px}
+h1{font-size:27px;letter-spacing:-.02em;margin:0 0 6px}
+h2{font-size:18px;letter-spacing:-.01em;margin:46px 0 6px;padding-top:20px;
+border-top:1px solid var(--line)}
+h3{font-size:13px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-3);margin:26px 0 8px}
+p{color:var(--ink-2);margin:9px 0;max-width:74ch}
+.sub{color:var(--ink-3);font-size:14px;margin-bottom:26px;max-width:74ch}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:16px 0}
+.fig{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px;margin:14px 0;overflow-x:auto}
+.fig .cap{font-size:12px;color:var(--ink-3);margin-top:10px;max-width:74ch}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:12px;margin:22px 0}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.kpi .n{font-size:23px;font-weight:700;letter-spacing:-.02em}
+.kpi .l{font-size:11.5px;color:var(--ink-3);margin-top:3px;line-height:1.35}
+.warn{background:var(--warn-bg);border:1px solid var(--warn-br);border-radius:10px;padding:16px 20px;margin:20px 0}
+.warn b{color:var(--accent)}
+.ok{background:var(--ok-bg);border:1px solid var(--ok-br);border-radius:10px;padding:16px 20px;margin:20px 0}
+.decision{background:var(--panel);border:2px solid var(--accent);border-radius:10px;padding:20px 22px;margin:22px 0}
+.decision .n{font-size:20px;font-weight:700;letter-spacing:-.01em;margin-bottom:6px}
+table{border-collapse:collapse;width:100%;font-size:13px;margin:10px 0}
+th,td{text-align:right;padding:6px 10px;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--ink-3);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+td.mono,th.mono{font-variant-numeric:tabular-nums}
+tr.hi td{background:var(--strip);font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:16px;margin:4px 0 14px;font-size:12px;color:var(--ink-3)}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:6px;vertical-align:3px}
+code{background:var(--strip);padding:1px 5px;border-radius:4px;font-size:12.5px}
+ul{color:var(--ink-2);max-width:74ch}li{margin:5px 0}
+.foot{color:var(--ink-4);font-size:12px;margin-top:40px;border-top:1px solid var(--line);padding-top:16px}</style></head><body><div class="wrap">
+
+<h1>Splitting the enhancing mask into lesions: 26-connectivity, floor 20&nbsp;mm³</h1>
+<div class="sub">The enhancing compartment answers "is this voxel tumour?" but not "how many lesions
+are there." Imposing lesion identity needs two choices — a connectivity rule and a volume floor.
+Both are settled here against all 93 practice-arm timepoints, not against intuition.</div>
+
+<div class="decision">
+<div class="n">Decision</div>
+<p style="margin-top:2px"><b>26-connectivity</b> (face, edge or corner contact joins two voxels),
+followed by a <b>20&nbsp;mm³ volume floor</b> applied to the lesion inventory only.</p>
+</div>
+
+<div class="kpis">
+<div class="kpi"><div class="n">83</div><div class="l">timepoints with enhancing
+disease, of 93 in the practice arm</div></div>
+<div class="kpi"><div class="n">87%</div><div class="l">of those, where
+6- and 26-connectivity agree on lesion count at this floor</div></div>
+<div class="kpi"><div class="n">0.192%</div><div class="l">of all enhancing
+volume discarded by the floor (1,046 of 545,591 mm³)</div></div>
+<div class="kpi"><div class="n">28</div><div class="l">timepoints where the largest lesion
+holds under 90% of enhancing volume</div></div>
+</div>
+
+<h2>Why 26 and not 6</h2>
+<p>The a-priori argument is that enhancing tumour presents as thin rims, one or two voxels thick
+after resampling, and 6-connectivity shatters a continuous rim into fragments. The sweep found a
+sharper argument that does not depend on that intuition.</p>
+<p>At a 20&nbsp;mm³ floor there are <b>2 timepoints where 6-connectivity ends up with
+FEWER surviving lesions than 26</b>, not more. It cannot merge anything — connectivity only ever
+splits — so the only way this happens is that 6-connectivity fragments a real lesion into pieces
+that individually fall below the floor and are then discarded.</p>
+<div class="warn"><b>The failure this avoids.</b> 6-connectivity combined with a floor does not
+merely over-count debris; it can delete genuine lesions outright. That is the over-merge failure
+mode — a lesion that silently stops existing — arriving through a side door. 26-connectivity
+cannot produce it, because any component it forms is a superset of the 6-connected one.</div>
+
+<h2>Choosing the floor</h2>
+<p>The floor is a hygiene filter on the lesion inventory: at 1&nbsp;mm atlas resolution, resampled
+from acquisitions with ~5&nbsp;mm slices, isolated few-voxel components are partial-volume and
+interpolation debris rather than tumour. Its cost is not volume — even at 100&nbsp;mm³ the floor
+discards well under 1% of enhancing volume. Its cost is <em>erasure</em>.</p>
+
+<div class="fig"><svg viewBox="0 0 500 200" width="100%" role="img" aria-label="connectivity agreement and timepoints zeroed versus volume floor"><line x1="44" y1="174.0" x2="490" y2="174.0" stroke="var(--grid)" stroke-width="1"/><text x="37" y="178.0" text-anchor="end" font-size="10" fill="var(--ink-4)">0%</text><line x1="44" y1="133.0" x2="490" y2="133.0" stroke="var(--grid)" stroke-width="1"/><text x="37" y="137.0" text-anchor="end" font-size="10" fill="var(--ink-4)">25%</text><line x1="44" y1="92.0" x2="490" y2="92.0" stroke="var(--grid)" stroke-width="1"/><text x="37" y="96.0" text-anchor="end" font-size="10" fill="var(--ink-4)">50%</text><line x1="44" y1="51.0" x2="490" y2="51.0" stroke="var(--grid)" stroke-width="1"/><text x="37" y="55.0" text-anchor="end" font-size="10" fill="var(--ink-4)">75%</text><line x1="44" y1="10.0" x2="490" y2="10.0" stroke="var(--grid)" stroke-width="1"/><text x="37" y="14.0" text-anchor="end" font-size="10" fill="var(--ink-4)">100%</text><rect x="309.8" y="10" width="26" height="164" fill="#b5533a" opacity=".07"/><polyline fill="none" stroke="var(--ink-2)" stroke-width="2" points="44.0,130.5 99.8,130.5 155.5,106.8 211.2,61.4 267.0,49.5 322.8,31.7 378.5,33.7 434.2,23.8 490.0,19.9"/><polyline fill="none" stroke="#b5533a" stroke-width="2" stroke-dasharray="4 3" points="44.0,174.0 99.8,174.0 155.5,172.0 211.2,170.0 267.0,168.1 322.8,160.2 378.5,158.2 434.2,154.2 490.0,146.3"/><circle cx="44.0" cy="130.5" r="2.6" fill="var(--ink-2)"/><circle cx="44.0" cy="174.0" r="2.6" fill="#b5533a"/><circle cx="99.8" cy="130.5" r="2.6" fill="var(--ink-2)"/><circle cx="99.8" cy="174.0" r="2.6" fill="#b5533a"/><circle cx="155.5" cy="106.8" r="2.6" fill="var(--ink-2)"/><circle cx="155.5" cy="172.0" r="2.6" fill="#b5533a"/><text x="155.5" y="165.0" text-anchor="middle" font-size="9" fill="#b5533a">1</text><circle cx="211.2" cy="61.4" r="2.6" fill="var(--ink-2)"/><circle cx="211.2" cy="170.0" r="2.6" fill="#b5533a"/><text x="211.2" y="163.0" text-anchor="middle" font-size="9" fill="#b5533a">2</text><circle cx="267.0" cy="49.5" r="2.6" fill="var(--ink-2)"/><circle cx="267.0" cy="168.1" r="2.6" fill="#b5533a"/><text x="267.0" y="161.1" text-anchor="middle" font-size="9" fill="#b5533a">3</text><circle cx="322.8" cy="31.7" r="2.6" fill="var(--ink-2)"/><circle cx="322.8" cy="160.2" r="2.6" fill="#b5533a"/><text x="322.8" y="153.2" text-anchor="middle" font-size="9" fill="#b5533a">7</text><circle cx="378.5" cy="33.7" r="2.6" fill="var(--ink-2)"/><circle cx="378.5" cy="158.2" r="2.6" fill="#b5533a"/><text x="378.5" y="151.2" text-anchor="middle" font-size="9" fill="#b5533a">8</text><circle cx="434.2" cy="23.8" r="2.6" fill="var(--ink-2)"/><circle cx="434.2" cy="154.2" r="2.6" fill="#b5533a"/><text x="434.2" y="147.2" text-anchor="middle" font-size="9" fill="#b5533a">10</text><circle cx="490.0" cy="19.9" r="2.6" fill="var(--ink-2)"/><circle cx="490.0" cy="146.3" r="2.6" fill="#b5533a"/><text x="490.0" y="139.3" text-anchor="middle" font-size="9" fill="#b5533a">14</text><text x="44.0" y="189" text-anchor="middle" font-size="10" fill="var(--ink-4)">0</text><text x="99.8" y="189" text-anchor="middle" font-size="10" fill="var(--ink-4)">1</text><text x="155.5" y="189" text-anchor="middle" font-size="10" fill="var(--ink-4)">2</text><text x="211.2" y="189" text-anchor="middle" font-size="10" fill="var(--ink-4)">5</text><text x="267.0" y="189" text-anchor="middle" font-size="10" fill="var(--ink-4)">10</text><text x="322.8" y="189" text-anchor="middle" font-size="10" fill="var(--ink-4)">20</text><text x="378.5" y="189" text-anchor="middle" font-size="10" fill="var(--ink-4)">33</text><text x="434.2" y="189" text-anchor="middle" font-size="10" fill="var(--ink-4)">50</text><text x="490.0" y="189" text-anchor="middle" font-size="10" fill="var(--ink-4)">100</text><text x="267" y="199" text-anchor="middle" font-size="10.5" fill="var(--ink-3)">volume floor (mm³)</text></svg>
+<div class="legend"><span><i style="background:var(--ink-2)"></i>connectivity agreement (%)</span>
+<span><i style="background:var(--accent)"></i>timepoints emptied by the floor (% of 83, count labelled)</span></div>
+<div class="cap">Raising the floor buys agreement between the two connectivities and pays for it by
+emptying more timepoints. The shaded band is the chosen floor.</div></div>
+
+<table><thead><tr><th>Floor mm³</th><th>26 vs 6 agree</th><th>Volume discarded</th>
+<th>% of arm</th><th>Timepoints emptied</th><th>Median lesions</th></tr></thead>
+<tbody><tr><td class=mono>0</td><td class=mono>22/83 &nbsp;26.5%</td><td class=mono>0</td><td class=mono>0.000%</td><td class=mono>0</td><td class=mono>4</td></tr><tr><td class=mono>1</td><td class=mono>22/83 &nbsp;26.5%</td><td class=mono>0</td><td class=mono>0.000%</td><td class=mono>0</td><td class=mono>4</td></tr><tr><td class=mono>2</td><td class=mono>34/83 &nbsp;41.0%</td><td class=mono>97</td><td class=mono>0.018%</td><td class=mono>1</td><td class=mono>3</td></tr><tr><td class=mono>5</td><td class=mono>57/83 &nbsp;68.7%</td><td class=mono>359</td><td class=mono>0.066%</td><td class=mono>2</td><td class=mono>2</td></tr><tr><td class=mono>10</td><td class=mono>63/83 &nbsp;75.9%</td><td class=mono>644</td><td class=mono>0.118%</td><td class=mono>3</td><td class=mono>1</td></tr><tr class="hi"><td class=mono>20</td><td class=mono>72/83 &nbsp;86.7%</td><td class=mono>1,046</td><td class=mono>0.192%</td><td class=mono>7</td><td class=mono>1</td></tr><tr><td class=mono>33</td><td class=mono>71/83 &nbsp;85.5%</td><td class=mono>1,529</td><td class=mono>0.280%</td><td class=mono>8</td><td class=mono>1</td></tr><tr><td class=mono>50</td><td class=mono>76/83 &nbsp;91.6%</td><td class=mono>2,168</td><td class=mono>0.397%</td><td class=mono>10</td><td class=mono>1</td></tr><tr><td class=mono>100</td><td class=mono>78/83 &nbsp;94.0%</td><td class=mono>3,388</td><td class=mono>0.621%</td><td class=mono>14</td><td class=mono>1</td></tr></tbody></table>
+
+<p>20&nbsp;mm³ sits where the two curves cross usefully. It is anchored, not tuned:</p>
+<ul>
+<li><b>Far below measurability.</b> A lesion satisfying RANO's 10&nbsp;×&nbsp;10&nbsp;mm bar on at
+least two slices occupies on the order of 100–200&nbsp;mm³. A 20&nbsp;mm³ floor is 5–10× below
+anything that could ever be a target lesion, so it cannot remove one.</li>
+<li><b>At the scale of the acquisition.</b> A single native voxel on a 0.9&nbsp;×&nbsp;0.9&nbsp;×&nbsp;5&nbsp;mm
+grid is about 4&nbsp;mm³; a 3&nbsp;×&nbsp;3 in-plane footprint on one native slice is roughly
+36&nbsp;mm³. Components below 20&nbsp;mm³ are smaller than anything independently observable in
+the data the segmentation was computed from.</li>
+<li><b>Still sensitive to new lesions.</b> The floor must stay well under measurability precisely
+because a new, non-measurable enhancing focus is still evidence of progression. 20&nbsp;mm³ keeps
+those.</li>
+</ul>
+
+<div class="warn"><b>The constraint this creates.</b> At 20&nbsp;mm³, 7 timepoints lose
+their entire lesion inventory (enhancing volumes 3, 3, 17, 21, 27, 28, 48&nbsp;mm³).
+Those timepoints still <em>have</em> enhancing disease. An empty inventory therefore means
+<b>"no measurable target lesion"</b> and must never be read as "no disease" or allowed to produce
+a CR. Volumetry never applies the floor — it sums every voxel — and the response call reads
+volume, not inventory size. This is the same distinction <code>measurement.py</code> already
+enforces between <code>None</code> and <code>False</code>.</div>
+
+<h2>What the floor actually removes</h2>
+<div class="fig"><svg viewBox="0 0 500 190" width="100%" role="img" aria-label="lesion count distribution before and after the floor"><rect x="38.1" y="164.0" width="20.3" height="0.0" fill="var(--ink-4)" rx="1.5"/><rect x="60.3" y="140.0" width="20.3" height="24.0" fill="#b5533a" rx="1.5"/><text x="70.5" y="137.0" text-anchor="middle" font-size="9" fill="var(--ink-3)">7</text><text x="59.3" y="179" text-anchor="middle" font-size="10" fill="var(--ink-4)">0</text><rect x="88.7" y="105.8" width="20.3" height="58.2" fill="var(--ink-4)" rx="1.5"/><text x="98.9" y="102.8" text-anchor="middle" font-size="9" fill="var(--ink-3)">17</text><rect x="111.0" y="10.0" width="20.3" height="154.0" fill="#b5533a" rx="1.5"/><text x="121.1" y="7.0" text-anchor="middle" font-size="9" fill="var(--ink-3)">45</text><text x="110.0" y="179" text-anchor="middle" font-size="10" fill="var(--ink-4)">1</text><rect x="139.4" y="122.9" width="20.3" height="41.1" fill="var(--ink-4)" rx="1.5"/><text x="149.5" y="119.9" text-anchor="middle" font-size="9" fill="var(--ink-3)">12</text><rect x="161.7" y="119.5" width="20.3" height="44.5" fill="#b5533a" rx="1.5"/><text x="171.8" y="116.5" text-anchor="middle" font-size="9" fill="var(--ink-3)">13</text><text x="160.7" y="179" text-anchor="middle" font-size="10" fill="var(--ink-4)">2</text><rect x="190.1" y="122.9" width="20.3" height="41.1" fill="var(--ink-4)" rx="1.5"/><text x="200.2" y="119.9" text-anchor="middle" font-size="9" fill="var(--ink-3)">12</text><rect x="212.3" y="129.8" width="20.3" height="34.2" fill="#b5533a" rx="1.5"/><text x="222.5" y="126.8" text-anchor="middle" font-size="9" fill="var(--ink-3)">10</text><text x="211.3" y="179" text-anchor="middle" font-size="10" fill="var(--ink-4)">3</text><rect x="240.7" y="126.4" width="20.3" height="37.6" fill="var(--ink-4)" rx="1.5"/><text x="250.9" y="123.4" text-anchor="middle" font-size="9" fill="var(--ink-3)">11</text><rect x="263.0" y="150.3" width="20.3" height="13.7" fill="#b5533a" rx="1.5"/><text x="273.1" y="147.3" text-anchor="middle" font-size="9" fill="var(--ink-3)">4</text><text x="262.0" y="179" text-anchor="middle" font-size="10" fill="var(--ink-4)">4</text><rect x="291.4" y="143.5" width="20.3" height="20.5" fill="var(--ink-4)" rx="1.5"/><text x="301.5" y="140.5" text-anchor="middle" font-size="9" fill="var(--ink-3)">6</text><rect x="313.7" y="160.6" width="20.3" height="3.4" fill="#b5533a" rx="1.5"/><text x="323.8" y="157.6" text-anchor="middle" font-size="9" fill="var(--ink-3)">1</text><text x="312.7" y="179" text-anchor="middle" font-size="10" fill="var(--ink-4)">5</text><rect x="342.1" y="140.0" width="20.3" height="24.0" fill="var(--ink-4)" rx="1.5"/><text x="352.2" y="137.0" text-anchor="middle" font-size="9" fill="var(--ink-3)">7</text><rect x="364.3" y="160.6" width="20.3" height="3.4" fill="#b5533a" rx="1.5"/><text x="374.5" y="157.6" text-anchor="middle" font-size="9" fill="var(--ink-3)">1</text><text x="363.3" y="179" text-anchor="middle" font-size="10" fill="var(--ink-4)">6</text><rect x="392.7" y="150.3" width="20.3" height="13.7" fill="var(--ink-4)" rx="1.5"/><text x="402.9" y="147.3" text-anchor="middle" font-size="9" fill="var(--ink-3)">4</text><rect x="415.0" y="164.0" width="20.3" height="0.0" fill="#b5533a" rx="1.5"/><text x="414.0" y="179" text-anchor="middle" font-size="10" fill="var(--ink-4)">7</text><rect x="443.4" y="116.1" width="20.3" height="47.9" fill="var(--ink-4)" rx="1.5"/><text x="453.5" y="113.1" text-anchor="middle" font-size="9" fill="var(--ink-3)">14</text><rect x="465.7" y="157.2" width="20.3" height="6.8" fill="#b5533a" rx="1.5"/><text x="475.8" y="154.2" text-anchor="middle" font-size="9" fill="var(--ink-3)">2</text><text x="464.7" y="179" text-anchor="middle" font-size="10" fill="var(--ink-4)">8+</text><line x1="34" y1="164" x2="490" y2="164" stroke="var(--line)"/><text x="262" y="189" text-anchor="middle" font-size="10.5" fill="var(--ink-3)">lesions in the timepoint (26-connectivity)</text></svg>
+<div class="legend"><span><i style="background:var(--ink-4)"></i>no floor</span>
+<span><i style="background:#b5533a"></i>floor 20 mm³</span></div>
+<div class="cap">Lesion counts per timepoint, before and after. Unfloored, the median timepoint
+carries 4 components and the worst
+carries 33. After the floor the median is
+1. Genuine multifocality survives:
+18 timepoints still carry three or more
+lesions.</div></div>
+
+<h2>Two constraints this puts on the measurement step</h2>
+<h3>One target lesion is not enough</h3>
+<div class="fig"><svg viewBox="0 0 500 190" width="100%" role="img" aria-label="share of enhancing volume in the largest lesion, sorted"><line x1="40" y1="164.0" x2="490" y2="164.0" stroke="var(--grid)"/><text x="33" y="168.0" text-anchor="end" font-size="10" fill="var(--ink-4)">0%</text><line x1="40" y1="125.5" x2="490" y2="125.5" stroke="var(--grid)"/><text x="33" y="129.5" text-anchor="end" font-size="10" fill="var(--ink-4)">25%</text><line x1="40" y1="87.0" x2="490" y2="87.0" stroke="var(--grid)"/><text x="33" y="91.0" text-anchor="end" font-size="10" fill="var(--ink-4)">50%</text><line x1="40" y1="48.5" x2="490" y2="48.5" stroke="var(--grid)"/><text x="33" y="52.5" text-anchor="end" font-size="10" fill="var(--ink-4)">75%</text><line x1="40" y1="10.0" x2="490" y2="10.0" stroke="var(--grid)"/><text x="33" y="14.0" text-anchor="end" font-size="10" fill="var(--ink-4)">100%</text><rect x="40" y="10" width="153.7" height="154" fill="#b5533a" opacity=".07"/><polyline fill="none" stroke="var(--ink-2)" stroke-width="2" points="40.0,119.3 45.5,112.7 51.0,109.5 56.5,102.2 62.0,100.6 67.4,93.9 72.9,78.4 78.4,78.2 83.9,74.1 89.4,72.4 94.9,70.5 100.4,70.4 105.9,66.3 111.3,64.2 116.8,63.7 122.3,61.3 127.8,52.1 133.3,51.4 138.8,43.1 144.3,42.0 149.8,37.1 155.2,36.9 160.7,33.8 166.2,33.5 171.7,30.5 177.2,29.9 182.7,29.5 188.2,27.0 193.7,24.7 199.1,20.6 204.6,20.5 210.1,20.0 215.6,19.4 221.1,19.0 226.6,17.2 232.1,16.7 237.6,16.2 243.0,16.1 248.5,15.3 254.0,15.0 259.5,14.4 265.0,14.3 270.5,12.3 276.0,12.3 281.5,11.6 287.0,11.5 292.4,10.9 297.9,10.8 303.4,10.7 308.9,10.6 314.4,10.5 319.9,10.4 325.4,10.3 330.9,10.2 336.3,10.2 341.8,10.1 347.3,10.1 352.8,10.1 358.3,10.1 363.8,10.1 369.3,10.1 374.8,10.1 380.2,10.0 385.7,10.0 391.2,10.0 396.7,10.0 402.2,10.0 407.7,10.0 413.2,10.0 418.7,10.0 424.1,10.0 429.6,10.0 435.1,10.0 440.6,10.0 446.1,10.0 451.6,10.0 457.1,10.0 462.6,10.0 468.0,10.0 473.5,10.0 479.0,10.0 484.5,10.0 490.0,10.0"/><line x1="40" y1="25.4" x2="490" y2="25.4" stroke="#b5533a" stroke-width="1.4" stroke-dasharray="5 3"/><text x="486" y="19.4" text-anchor="end" font-size="10" fill="#b5533a">90% of enhancing volume in one lesion</text><text x="117" y="155" text-anchor="middle" font-size="10.5" fill="#b5533a">28 timepoints where one target is not enough</text><text x="265" y="189" text-anchor="middle" font-size="10.5" fill="var(--ink-3)">the 83 timepoints with enhancing disease, sorted</text></svg>
+<div class="cap">Share of enhancing volume held by the largest lesion, one point per timepoint,
+sorted. Median 97.2%, but the
+minimum is 29.0%.</div></div>
+<p>In <b>28 of 83</b> timepoints the largest lesion holds under 90% of the
+enhancing volume. Selecting a single biggest target and measuring only that would discard the
+majority of the disease in the worst cases. RANO's sum of products across several target lesions
+is not a formality — this arm needs it.</p>
+
+<h3>Cross-sections are routinely in several pieces</h3>
+<p>Across every axial slice occupied by a largest lesion (2,045 slices in total),
+<b>50.4%</b> show that single lesion as more than one disjoint 2-D piece — the
+lesion is connected through adjacent slices, not within the slice. Only
+1
+timepoint is fragmented on every one of its slices, and
+18 are never
+fragmented. Any per-slice diameter measurement must handle a multi-piece cross-section as the
+normal case, and must never draw a caliper across the gap between two pieces.</p>
+
+<div class="ok"><b>Reproduce.</b>
+<code>.venv/bin/python scripts/sweep_connectivity.py</code> writes
+<code>output/connectivity/connectivity_sweep.json</code>;
+<code>scripts/summarize_connectivity_sweep.py</code> prints the tables and
+<code>scripts/render_lesion_split_decision.py</code> regenerates this page. The sweep's component
+labelling was cross-checked against an independent breadth-first implementation on
+Patient-067 week-109 (9 vs 9 components under 26-connectivity, 16 vs 16 under 6).</div>
+
+<div class="foot">LUMIERE · lesion-splitting decision · practice arm only (93 timepoints,
+7 patients) · atlas MNI 1&nbsp;mm isotropic, 1 voxel = 1&nbsp;mm³ · enhancing compartment
+(DeepBraTumIA label 1) · generated by <code>scripts/render_lesion_split_decision.py</code></div>
+</div></body></html>
