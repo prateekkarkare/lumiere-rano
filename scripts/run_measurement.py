@@ -94,6 +94,52 @@ def components(mask: np.ndarray, floor: int = FLOOR) -> list[np.ndarray]:
     return groups
 
 
+#: Within this many mm on BOTH axes, our lesion is taken to be the one the radiologist measured.
+#: There is no ground truth for WHICH lesion they meant -- only their numbers -- so this split is
+#: partly circular: agreement defines "same lesion", and agreement is then reported. The
+#: diagnoses for the far cases do not lean on it; they come from lesion counts and sizes.
+SAME_LESION_MM = 5.0
+
+
+def summarize(records: list[dict]) -> None:
+    """The headline figures docs/progress.html quotes, printed so they can be regenerated."""
+    ok = [r for r in records if r.get("status") == "ok"]
+    err = {id(r): (r["best_match"]["long_mm"] - r["expert_long_mm"],
+                   r["best_match"]["perp_mm"] - r["expert_short_mm"]) for r in ok}
+    close = [r for r in ok if max(abs(e) for e in err[id(r)]) <= SAME_LESION_MM]
+    far = [r for r in ok if max(abs(e) for e in err[id(r)]) > SAME_LESION_MM]
+    print(f"\n{len(ok)} measurable timepoints: {len(close)} land within {SAME_LESION_MM:.0f} mm "
+          f"on both axes, {len(far)} do not")
+
+    if close:
+        dl = np.array([err[id(r)][0] for r in close])
+        ds = np.array([err[id(r)][1] for r in close])
+        print("\nWHERE WE MEASURED THE SAME LESION THEY DID")
+        print(f"  long axis      median {np.median(dl):+.1f} mm   range {dl.min():+.1f} to {dl.max():+.1f}")
+        print(f"  perpendicular  median {np.median(ds):+.1f} mm   range {ds.min():+.1f} to {ds.max():+.1f}")
+
+    print("\nWHERE WE DID NOT -- and why")
+    for r in sorted(far, key=lambda r: -abs(err[id(r)][0])):
+        if len(r["expert_all"]) > 1:
+            why = f"they measured {len(r['expert_all'])} separate lesions; we found {r['n_lesions']}"
+        elif not r["best_is_biggest"]:
+            why = "they follow a lesion that is not our biggest"
+        elif err[id(r)][0] > 8:
+            why = "our lesion is far larger -- merged, or a different target"
+        else:
+            why = "our lesion is smaller than the one they measured"
+        e = f"{r['expert_long_mm']:.0f}x{r['expert_short_mm']:.0f}"
+        o = f"{r['best_match']['long_mm']:.1f}x{r['best_match']['perp_mm']:.1f}"
+        print(f"  {r['patient']:<13} {r['timepoint']:<11} {e:>8} {o:>11}  {why}")
+
+    agree = sum(1 for r in ok if r["best_match"]["measurable"]
+                == (r["expert_long_mm"] >= 10 and r["expert_short_mm"] >= 10))
+    ce = np.array([r["best_match"]["caliper_excess_mm"] for r in ok])
+    print(f"\nMEASURABILITY GATE (>= 10 x 10 mm): agrees with their written numbers at {agree}/{len(ok)}")
+    print(f"SHAPE WARNING (caliper minus constrained long axis): median {np.median(ce):.2f} mm, "
+          f"{int((ce > 3).sum())}/{len(ce)} awkward enough to flag")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--zip", default=str(DEFAULT_ZIP))
@@ -165,6 +211,7 @@ def main() -> int:
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps(records, indent=1))
     print(f"\nwrote {p.relative_to(ROOT)}  ({time.time()-t0:.0f}s)")
+    summarize(records)
     return 0
 
 

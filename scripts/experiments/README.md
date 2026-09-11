@@ -30,6 +30,7 @@ arm only**; the 17 held-out patients are never opened.
 | `where_is_36mm.py` | Patient-072: the radiologist says 13 mm, we say 36 mm. Where does 36 come from? | The ruler was measuring **across the gap between separate pieces** on one slice — straight through healthy brain. This became rule 2 of the ruler. |
 | `who_is_the_target.py` | Which of our objects is the one they measured? | A small second lesion, not our biggest. The first sign that target selection is its own problem. |
 | `erode_test.py` | Is Patient-072's big object several lumps joined by thin necks? | No. Eroding 1 mm leaves it in one piece. It is genuinely one solid mass. |
+| `surgical_cavities.py` | Does the necrosis label contain surgical cavities? | Yes. Where the surgeon removed *all* the enhancing tumour, "necrosis" is larger than where tumour is growing (median 11,689 vs 6,656 mm³). Patient-062: 1,631 mm³ of tumour beside 73,661 of "necrosis". This is why the ruler fills only holes the tissue encloses. |
 
 ## 3. Tracking lesions from visit to visit
 

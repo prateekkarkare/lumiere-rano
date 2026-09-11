@@ -374,7 +374,7 @@
     image shares one grid, and it passes — correctly. It just never compared the contents.</p>
   <p>The control is the brain itself: a patient's brain does not wander between visits, so any
     mismatch is ours.</p>
-  <div class="keyfact">Consecutive visits' brain masks overlap only <b>91%</b>, and the brain's
+  <div class="keyfact">Consecutive visits' brain masks overlap only <b>92%</b>, and the brain's
     centre of mass sits about <b>2.7&nbsp;mm</b> out (worst case 10.2&nbsp;mm).</div>
   <p>Three other explanations were tested and each ruled out by its own number:</p>
   <div class="tblwrap"><table>
@@ -407,7 +407,7 @@
     by nearly 18. So we added SimpleITK and built proper rigid registration: six numbers per
     visit, three to slide and three to turn, matched on <b>brain minus lesion</b> (the tumour is
     the thing that changed, so letting it drive the fit means pulling everything else out of true).</p>
-  <div class="keyfact">All 93 visits registered in 74 seconds. Brain overlap <b>91.0% →
+  <div class="keyfact">All 93 visits registered in 74 seconds. Brain overlap with each patient's first visit <b>91.0% →
     95.1%</b>, worst case 69.6% → 85.6%, and nothing made worse. The number that mattered: how
     much of a lesion lands on the same lesion next visit, for lesions under 500&nbsp;mm³, went
     from <b>4% to 30%</b>. Large lesions went 90% → 98%.</div>
@@ -622,7 +622,7 @@ week-120   56,247 mm³                  <span class="go">87.6 mm</span> away    
       <tr><td>Lesion splitting</td><td class="v-ok">decided</td>
         <td>26-connectivity + 20&nbsp;mm³ floor, swept over 93 timepoints.</td></tr>
       <tr><td>Intra-patient registration</td><td class="v-ok">solid</td>
-        <td>Brain overlap 91 → 95%, 0/93 made worse, outcome-checked with fallbacks.</td></tr>
+        <td>Brain overlap with the first visit 91 → 95%, 0/93 made worse, outcome-checked with fallbacks.</td></tr>
       <tr><td>Bidimensional ruler</td><td class="v-ok">solid</td>
         <td>Validated on shapes with known answers; +1.2&nbsp;mm median against real expert
           measurements, exactly as the phantoms predicted.</td></tr>
