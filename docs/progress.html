@@ -166,7 +166,7 @@
     <span class="chip done"><span class="n">2</span> Registration</span>
     <span class="chip done"><span class="n">2</span> Bidimensional ruler</span>
     <span class="chip wip"><span class="n">2</span> Target selection</span>
-    <span class="chip pending"><span class="n">2</span> New-lesion detection</span>
+    <span class="chip wip"><span class="n">2</span> New-lesion detection</span>
   </div>
 </header>
 
@@ -446,8 +446,8 @@ week-120   56,247 mm³                  <span class="go">87.6 mm</span> away    
 
   <div class="qa">
     <div class="q">So what are the radiologists actually doing?</div>
-    <p>Their own words give it away. Across 501 rationales they write <code>less than 3
-      months</code> 25 times, and repeatedly note whether something is <code>within the irradiated
+    <p>Their own words give it away. Across 329 rationales they write <code>less than 3
+      months</code> 19 times, and repeatedly note whether something is <code>within the irradiated
       area</code> or <code>outside of irradiation field</code>. One entry reads <em>"dural
       recurrence despite within 3 months of radiochemotherapy"</em>.</p>
     <p>They are answering a question we never asked: <b>is this enhancement even tumour?</b> After
@@ -464,31 +464,50 @@ week-120   56,247 mm³                  <span class="go">87.6 mm</span> away    
     At every margin, roughly the same proportion of "new lesion" visits and "ordinary growth"
     visits had tissue outside the zone. As a rule it scored 41% precision against a 31% base rate,
     worse than the connectivity rule it was meant to beat.</p>
-  <div class="gotcha"><b>Why that attempt was doomed, in hindsight.</b> Only 39 of 501 rationales
-    invoke the field or the clock at all — under 8%. We found a genuine piece of domain reasoning
-    and over-weighted it into the main mechanism. It applies in a specific early window, and there
-    are only seven such visits in the whole practice arm.</div>
+  <div class="gotcha"><b>Why that attempt was doomed, in hindsight.</b> Only 32 of 329 rationales
+    invoke the field or the clock at all — about one in ten. We found a genuine piece of domain
+    reasoning and over-weighted it into the main mechanism. It applies in a specific early window,
+    and there are only seven such visits in the whole practice arm.</div>
+  <div class="gotcha"><b>A cohort-lock breach, recorded rather than hidden.</b> The first time
+    these notes were counted, the count read every patient in the ratings file — including the 17
+    held-out patients the lock says must not be examined before the scoring run. That gave 39 of
+    501. The figures above exclude the held-out arm and come from
+    <code>scripts/experiments/rationale_vocabulary.py</code>. The conclusion did not change, and
+    every phrase quoted on this page was checked against the permitted notes alone.</div>
 
+  <p>One more idea did work — better than anything else we tried. Think about what each kind of
+    change looks like. A lesion that <em>grows</em> puts on a thin new layer all round its edge,
+    like a skin. A <em>new</em> focus arrives as a lump with an inside to it, even when it is
+    touching the old tumour. So take only the newly-enhancing tissue and peel one millimetre off
+    everything. A skin disappears. A lump survives.</p>
   <div class="tblwrap"><table>
-    <thead><tr><th>Scoreboard, 70 assessable transitions</th><th>Result</th></tr></thead>
+    <thead><tr><th>70 assessable transitions · 22 new lesions reported</th><th>Catches</th><th>Precision</th></tr></thead>
     <tbody>
-      <tr><td>They report a new lesion at 22 visits; we catch…</td><td class="num v-flag">8 (36%)</td></tr>
-      <tr><td>We report one at 16 visits; confirmed…</td><td class="num v-flag">8 (50%)</td></tr>
-      <tr><td>Both agree nothing happened</td><td class="num v-ok">40</td></tr>
-      <tr><td>New object above <b>500&nbsp;mm³</b>, confirmed by the radiologist</td><td class="num v-ok">5 of 5</td></tr>
+      <tr><td>Overlap rule — a new object touching nothing from last visit</td>
+        <td class="num v-flag">8 of 22 (36%)</td><td class="num">50%</td></tr>
+      <tr><td>Overlap rule, objects above <b>500&nbsp;mm³</b> only</td>
+        <td class="num">5 of 22 (23%)</td><td class="num v-ok">5 of 5</td></tr>
+      <tr><td><b>Lump rule</b> — new tissue that survives a 1&nbsp;mm peel, 20&nbsp;mm³ or more</td>
+        <td class="num v-ok">16 of 22 (73%)</td><td class="num">46%</td></tr>
+      <tr><td>Treated-field rule</td>
+        <td class="num">—</td><td class="num v-flag">41%, against a 31% base rate</td></tr>
     </tbody>
   </table></div>
-  <div class="keyfact"><b>What we do have.</b> A new object above 500&nbsp;mm³ that overlaps
-    nothing before was confirmed by the radiologist 5 times out of 5. High confidence, covering
-    just under a quarter of cases. Keep it — but <b>its silence must never be read as "no new
-    lesion"</b>.</div>
-  <div class="openq"><b>Where we stopped, deliberately.</b> Three features tried — connectivity,
-    distance, treated field — and none separate a new lesion from ordinary growth. Rather than
-    reach for a fourth, the next step is to check whether the information is in the mask at all:
-    open three or four of the 14 missed visits in the browser and look at the MRI beside the mask.
-    Either there is a visible nodule the segmentation never marked (the ceiling is DeepBraTumIA,
-    and no cleverness over this mask recovers it), or it is marked and we are failing to isolate
-    it. We do not yet know which, and every downstream decision depends on the answer.</div>
+  <p>The lump rule doubles what we catch, at about the same precision. And its extra flags — the
+    ones the notes do not mention — are not scattered. Of the visits where the notes name no new
+    lesion, it fires on <b>62%</b> of those already called progression and on <b>none</b> of those
+    called complete or partial response. The notes are terse, not an inventory, so silence is not
+    proof of absence: these extras look like real disease that simply was not written down.</p>
+  <div class="keyfact"><b>What we have.</b> Two usable signals. The lump rule for <b>reach</b> — it
+    catches three quarters of the new lesions the radiologist reported. The 500&nbsp;mm³ overlap
+    rule for <b>certainty</b> — five flags, five confirmed. Neither one's silence can be read as
+    "no new lesion".</div>
+  <div class="openq"><b>Where we stopped, and what is honest about it.</b> The lump rule was
+    designed and measured on the same seven patients, so it is promising, not proven. Patient-072
+    is still the hard case: at a 100&nbsp;mm³ lump it catches 2 of its 9. The next step is to open
+    the six visits it still misses in the browser and look at the MRI beside the mask. Either
+    there is a visible nodule the segmentation never marked — then the ceiling is DeepBraTumIA, and
+    no rule over this mask recovers it — or it is marked and we are failing to isolate it.</div>
 </section>
 
 <section class="story" id="ruler">
@@ -610,8 +629,10 @@ week-120   56,247 mm³                  <span class="go">87.6 mm</span> away    
       <tr><td>Target selection over time</td><td class="v-flag">open</td>
         <td>Radiologists promote and demote targets across visits. "Biggest lesion" is right for
           some patients and wrong for Patient-072 at every visit.</td></tr>
-      <tr><td>New-lesion detection</td><td class="v-flag">open</td>
-        <td>36% recall, 50% precision. High-confidence signal only above 500&nbsp;mm³.</td></tr>
+      <tr><td>New-lesion detection</td><td class="v-flag">promising</td>
+        <td>Lump rule catches 73% at 46% precision, its extras falling on progression visits and
+          never on responses. Designed and measured on the same seven patients — not yet proven.
+          Overlap above 500&nbsp;mm³: 5 of 5 confirmed.</td></tr>
       <tr><td>Over-merging</td><td class="v-flag">open</td>
         <td>Patient-031 week-190: they measured three lesions, we produced one. Flagged in the
           splitting memo as the failure nothing protects against; now observed.</td></tr>
@@ -647,6 +668,10 @@ week-120   56,247 mm³                  <span class="go">87.6 mm</span> away    
 <span class="dim"># the ruler: validation drawings, then the comparison with the radiologists</span>
 .venv/bin/python scripts/render_ruler_validation.py
 .venv/bin/python scripts/run_measurement.py
+
+<span class="dim"># every investigation behind this page, indexed in scripts/experiments/README.md</span>
+.venv/bin/python scripts/experiments/newlesion_arm.py    <span class="dim"># the scoreboard</span>
+.venv/bin/python scripts/experiments/new_focus.py        <span class="dim"># the lump rule</span>
 
 <span class="dim"># everything</span>
 .venv/bin/python -m pytest -q                   <span class="go"># 181 passing</span></pre></div>
