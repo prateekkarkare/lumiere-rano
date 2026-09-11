@@ -112,161 +112,556 @@
   footer { margin-top: 3.5rem; padding-top: 1.4rem; border-top: 1px solid var(--line); color: var(--muted);
     font-size: 0.78rem; font-family: var(--mono); }
 </style>
-
+<style>
+  /* narrative additions */
+  .story p { font-size: 1.0rem; color: var(--ink-soft); max-width: 68ch; margin: 0.75rem 0; }
+  .story p.first { font-size: 1.06rem; color: var(--ink); }
+  .story b { color: var(--ink); font-weight: 620; }
+  .fig { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 1.1rem 1.2rem; margin: 1.2rem 0; }
+  .fig figcaption { font-size: 0.85rem; color: var(--muted); margin-top: 0.7rem; max-width: 66ch; }
+  .fig svg { display: block; width: 100%; height: auto; }
+  .svgt { font-family: var(--mono); font-size: 11px; fill: var(--muted); }
+  .svgt.b { fill: var(--ink-soft); font-size: 12px; }
+  .keyfact { border-left: 3px solid var(--accent); background: color-mix(in srgb, var(--accent) 7%, transparent);
+    border-radius: 0 8px 8px 0; padding: 0.85rem 1.1rem; margin: 1.2rem 0; font-size: 0.95rem;
+    color: var(--ink-soft); max-width: 70ch; }
+  .keyfact b { color: var(--accent-ink); }
+  .gotcha { border-left: 3px solid var(--warn); background: color-mix(in srgb, var(--warn) 8%, transparent);
+    border-radius: 0 8px 8px 0; padding: 0.85rem 1.1rem; margin: 1.2rem 0; font-size: 0.95rem;
+    color: var(--ink-soft); max-width: 70ch; }
+  .gotcha b { color: var(--warn); }
+  .openq { border-left: 3px solid var(--fail); background: color-mix(in srgb, var(--fail) 7%, transparent);
+    border-radius: 0 8px 8px 0; padding: 0.85rem 1.1rem; margin: 1.2rem 0; font-size: 0.95rem;
+    color: var(--ink-soft); max-width: 70ch; }
+  .openq b { color: var(--fail); }
+  .qa { margin: 1.1rem 0; }
+  .qa .q { font-weight: 620; color: var(--ink); font-size: 1.0rem; margin-bottom: 0.2rem; }
+  .toc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.2rem;
+    margin: 1.6rem 0; }
+  .toc ol { margin: 0.4rem 0 0; padding-left: 1.3rem; color: var(--ink-soft); font-size: 0.93rem; }
+  .toc li { margin: 0.28rem 0; }
+  .toc a { color: var(--accent-ink); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+</style>
 <div class="wrap">
-  <header>
-    <p class="kicker">LUMIERE · Volumetric RANO Pipeline · Piece 1</p>
-    <h1>Progress Report — Data Loader &amp; Validator</h1>
-    <p class="lede">Where Piece 1 actually stands: what's built, what's verified against the real
-      31,370-member archive (not assumed), and what's still ahead. Companion to the
-      <span class="related">architecture map (C4) — ask to reopen it if you don't have the link handy.</span></p>
-    <div class="track">
-      <span class="chip done"><span class="n">1</span> Contract + adapter ABCs</span>
-      <span class="chip done"><span class="n">2</span> LUMIERE adapter</span>
-      <span class="chip wip"><span class="n">3</span> Fingerprinter</span>
-      <span class="chip pending"><span class="n">4</span> Validator</span>
-      <span class="chip pending"><span class="n">5</span> Router</span>
-      <span class="chip pending"><span class="n">6</span> Volumetry</span>
-      <span class="chip pending"><span class="n">7</span> Tests (synthetic)</span>
-      <span class="chip pending"><span class="n">8</span> Cohort QC note</span>
-    </div>
-  </header>
 
-  <!-- ============ what's built ============ -->
-  <section>
-    <div class="lvl-head"><span class="lvl-tag">Built</span><h2>Components shipped so far</h2></div>
-    <p class="sub">Three pieces, each committed and independently verified against the real dataset —
-      not sample data, not assumptions.</p>
+<header>
+  <p class="kicker">LUMIERE · Volumetric RANO Pipeline · running notes</p>
+  <h1>What we learned, in order</h1>
+  <p class="lede">Not a status report — the <b>story</b>. Every section starts from a question,
+    shows what the data said, and ends with what we decided and why. Written so that six months
+    from now you can read it top to bottom and rebuild the whole picture without re-deriving
+    anything.</p>
+  <p class="related">Companion docs: <a href="piece1_readiness.html">Piece 1 closeout</a> ·
+    <a href="volume_audit.html">volumetry audit</a> ·
+    <a href="lesion_split_decision.html">lesion-splitting decision</a> ·
+    <a href="ruler_validation.html">ruler validation</a> ·
+    <a href="architecture.html">architecture map</a></p>
+  <div class="track">
+    <span class="chip done"><span class="n">1</span> Loader + validator</span>
+    <span class="chip done"><span class="n">1</span> Volumetry (atlas)</span>
+    <span class="chip done"><span class="n">1</span> RANO criteria</span>
+    <span class="chip done"><span class="n">2</span> Lesion splitting</span>
+    <span class="chip done"><span class="n">2</span> Registration</span>
+    <span class="chip done"><span class="n">2</span> Bidimensional ruler</span>
+    <span class="chip wip"><span class="n">2</span> Target selection</span>
+    <span class="chip pending"><span class="n">2</span> New-lesion detection</span>
+  </div>
+</header>
 
-    <div class="comp">
-      <h3>Contract + Adapter Seam <span class="status done">done</span></h3>
-      <p>The internal representation every ingestion front-door reduces to: <code>Patient</code>,
-        <code>Timepoint</code>, <code>ImageRef</code> (lazy, header-only geometry), <code>Space</code>
-        (per-image, not per-timepoint). The <code>Adapter</code> ABC is the two-front-door contract —
-        proven by a real second subclass (<code>DicomAdapter</code>), not just an interface on paper.</p>
-      <p class="files">src/rano/contract/case.py · src/rano/adapters/base.py · adapters/dicom.py</p>
-      <div class="verified"><b>Verified</b> — a no-data smoke test exercises every type end-to-end:
-        <code>Geometry.from_header</code> derives spacing/orientation/anisotropy correctly on both an
-        isotropic and a thick-slice synthetic case; a fake <code>ImageRef</code> proves the ABC is
-        satisfiable; <code>Patient.__post_init__</code> rejects out-of-order timepoints;
-        <code>DicomAdapter</code> is a real <code>Adapter</code> subclass whose stub methods raise
-        <code>NotImplementedError</code> as designed.</div>
-    </div>
+<div class="toc">
+  <b>The thread, in order</b>
+  <ol>
+    <li><a href="#two">Why there are two different measurements</a></li>
+    <li><a href="#count">A mask says which voxels are tumour, not how many tumours</a></li>
+    <li><a href="#one">One lesion can look like three</a></li>
+    <li><a href="#same">Is this the same lesion as last time?</a></li>
+    <li><a href="#align">The scans were never lined up</a></li>
+    <li><a href="#newlesion">New lesions: still unsolved, and we know why</a></li>
+    <li><a href="#ruler">Measuring a lesion</a></li>
+    <li><a href="#state">What is solid, what is open</a></li>
+    <li><a href="#restart">Picking this back up</a></li>
+  </ol>
+</div>
 
-    <div class="comp">
-      <h3>LUMIERE Adapter <span class="status done">done</span></h3>
-      <p>Resolves <code>LUMIERE-datacompleteness.csv</code> (the ground-truth manifest) + the 32.6&nbsp;GB
-        imaging zip into lazy <code>Patient</code> objects — streamed via <code>zipfile</code>, no
-        extraction. Wires the mask plus an MNI-space <code>mask_reference</code> and <code>brain_mask</code>
-        beside it, so later alignment checks compare grids that are actually meant to match.</p>
-      <p class="files">src/rano/adapters/lumiere/{paths,weeks,zip_ref,adapter}.py</p>
-      <div class="verified"><b>Verified against the real archive</b> —
-        <table style="margin-top:0.4rem"><tbody>
-          <tr><td style="padding:0.2rem 0">Patient / timepoint counts</td><td class="num v-ok">91 / 638 — exact match with manifest</td></tr>
-          <tr><td style="padding:0.2rem 0">(patient, timepoint) set identity</td><td class="v-ok">identical, 0 extra either side</td></tr>
-          <tr><td style="padding:0.2rem 0">Chronological ordering</td><td class="v-ok">held for all 91 patients</td></tr>
-          <tr><td style="padding:0.2rem 0">ImageRef streams real voxels</td><td>header-only geometry ~8ms; full mask <code>load()</code> ~2ms; labels read back <code>[0,1,2,3]</code></td></tr>
-          <tr><td style="padding:0.2rem 0">Manifest ↔ zip audit</td><td class="v-flag">40 discrepancies = 8 fully-empty timepoints, all Patient-025 (see below)</td></tr>
-        </tbody></table>
-      </div>
-    </div>
+<section class="story" id="two">
+  <div class="lvl-head"><span class="lvl-tag">Start here</span><h2>Why there are two different measurements</h2></div>
+  <p class="first">The pipeline reports <b>volume</b> — count the enhancing voxels, watch that
+    number across visits, call the response from how much it changed. That decision was made on
+    2026-07-21, choosing volumetric RANO over the classic 2D method.</p>
+  <p>But every expert rating in this dataset was made by a radiologist with a ruler, writing
+    things like <code>Target L.: 29mm x 38mm</code>. So we are building a better instrument and
+    the only answer key we have was written with the old one.</p>
+  <p>Picture building a digital kitchen scale where the only recipe book you can test against
+    measures in cups. You will never <em>report</em> in cups. But when your scale says 240 grams
+    and the book says two cups, you need to know whether you two agree.</p>
+  <p>There is a second, stronger reason. RANO will only let you track a lesion as a
+    <b>target</b> if it is at least 10&nbsp;mm across and still 10&nbsp;mm across turned ninety
+    degrees. That rule is written in millimetres, not cubic millimetres — and we proved
+    separately that no volume threshold can stand in for it
+    (<code>min_absolute_change_mm3</code> turned out never to change a single call).</p>
+  <div class="keyfact"><b>So:</b> volume is what we report. The ruler is two tools we cannot do
+    without — a <b>translator</b> for reading the expert's answer key, and the <b>gate</b> that
+    decides which lesions are allowed into the answer at all.</div>
+</section>
 
-    <div class="comp">
-      <h3>Atlas-Space Consistency Fingerprint <span class="status done">done</span> <span style="font-size:0.75rem;color:var(--muted);font-weight:400">— seed of step 3</span></h3>
-      <p>A pure, read-only, adapter-agnostic check: does every DeepBraTumIA atlas-space image (mask +
-        reference + brain mask) across the whole cohort actually share one grid? This is the real
-        failure mode a "canonical mask" claim could hide — not whether the label is externally correct.</p>
-      <p class="files">src/rano/fingerprint/atlas_consistency.py</p>
-      <div class="verified"><b>Verified</b> — <span class="num">1,773 / 1,773</span> MNI-tagged images
-        across all 91 patients share an identical affine + shape <code>(182, 218, 182)</code>, to
-        floating-point precision. Zero outliers.</div>
-    </div>
-  </section>
+<section class="story" id="count">
+  <div class="lvl-head"><span class="lvl-tag">Decided</span><h2>A mask says which voxels are tumour, not how many tumours</h2></div>
+  <p class="first">The segmentation labels every voxel. It is completely silent on how many
+    separate lesions those voxels form — and nothing in a label map encodes that. You have to
+    impose it.</p>
+  <p>The rule is: two voxels belong to the same lesion if they touch. The only question is what
+    "touch" means.</p>
 
-  <!-- ============ verified facts ============ -->
-  <section>
-    <div class="lvl-head"><span class="lvl-tag">Evidence</span><h2>What the real data told us</h2></div>
-    <p class="sub">Every row below was measured against the actual archive this session, not assumed.</p>
-    <div class="tblwrap">
-      <table>
-        <thead><tr><th>Finding</th><th>Detail</th></tr></thead>
-        <tbody>
-          <tr><td>Cohort size</td><td class="num">91 patients, 638 timepoints — all reconcile exactly with the manifest</td></tr>
-          <tr><td>Every patient is longitudinal</td><td><b>0</b> single-timepoint patients in LUMIERE — the router's N=1 "segment+store" branch has no LUMIERE case to exercise; will need a synthetic one</td></tr>
-          <tr><td>Native geometry is extremely anisotropic</td><td>Patient-001 FLAIR: <span class="num">640×640×40</span> @ <span class="num">0.36×0.36×4.4mm</span> → <span class="num v-flag">12.24×</span> anisotropy ratio — concrete proof isotropy-gating in the loader would reject good data</td></tr>
-          <tr><td>Patient-025 label mismatch</td><td>Manifest lists weeks 006/008/025/036/049/061/065/076; the zip actually holds this patient under weeks 000/001/019/030/043/055/059/070 — same count (8), <em>different labels</em>. Data is NOT missing, just unreachable under manifest-authoritative loading. <b>Decision:</b> keep manifest-authoritative, flag as unusable, don't reconcile.</td></tr>
-          <tr><td>Atlas space is cohort-consistent</td><td><span class="num v-ok">1,773 / 1,773</span> images share one grid — origin <span class="num">(90, −126, −72)</span>, 1mm diagonal (matches the well-known FSL MNI152_T1_1mm signature, noted in passing, not depended upon)</td></tr>
-          <tr><td>Mask labels match schema</td><td>Real DeepBraTumIA mask read back unique values <span class="num">[0,1,2,3]</span> — consistent with <code>label_schema.py</code></td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
+  <figure class="fig">
+    <svg viewBox="0 0 680 210" role="img" aria-label="6-connectivity shares a face, 26-connectivity also counts edges and corners">
+      <text class="svgt b" x="110" y="18" text-anchor="middle">6-connectivity — faces only</text>
+      <text class="svgt b" x="450" y="18" text-anchor="middle">26-connectivity — faces, edges and corners</text>
+      <g transform="translate(30,34)">
+        <g fill="none" stroke="var(--line)" stroke-width="1">
+          <rect x="0" y="0" width="150" height="150"/>
+          <line x1="50" y1="0" x2="50" y2="150"/><line x1="100" y1="0" x2="100" y2="150"/>
+          <line x1="0" y1="50" x2="150" y2="50"/><line x1="0" y1="100" x2="150" y2="100"/>
+        </g>
+        <rect x="50" y="50" width="50" height="50" fill="var(--accent)" opacity=".75"/>
+        <rect x="50" y="0" width="50" height="50" fill="var(--accent)" opacity=".3"/>
+        <rect x="50" y="100" width="50" height="50" fill="var(--accent)" opacity=".3"/>
+        <rect x="0" y="50" width="50" height="50" fill="var(--accent)" opacity=".3"/>
+        <rect x="100" y="50" width="50" height="50" fill="var(--accent)" opacity=".3"/>
+        <text class="svgt" x="75" y="172" text-anchor="middle">4 of 8 in this plane</text>
+      </g>
+      <g transform="translate(370,34)">
+        <g fill="none" stroke="var(--line)" stroke-width="1">
+          <rect x="0" y="0" width="150" height="150"/>
+          <line x1="50" y1="0" x2="50" y2="150"/><line x1="100" y1="0" x2="100" y2="150"/>
+          <line x1="0" y1="50" x2="150" y2="50"/><line x1="0" y1="100" x2="150" y2="100"/>
+        </g>
+        <rect x="0" y="0" width="150" height="150" fill="var(--accent)" opacity=".3"/>
+        <rect x="50" y="50" width="50" height="50" fill="var(--accent)" opacity=".75"/>
+        <text class="svgt" x="75" y="172" text-anchor="middle">all 8 in this plane</text>
+      </g>
+      <text class="svgt" x="600" y="100" text-anchor="middle">in 3D:</text>
+      <text class="svgt" x="600" y="118" text-anchor="middle">6 vs 26</text>
+      <text class="svgt" x="600" y="136" text-anchor="middle">neighbours</text>
+    </svg>
+    <figcaption>One slice of the neighbourhood. In three dimensions a voxel has 6 face-neighbours
+      or 26 if you also count edges and corners. Touching at a single corner is either a
+      connection or it is not — that is the whole choice.</figcaption>
+  </figure>
 
-  <!-- ============ decisions ============ -->
-  <section>
-    <div class="lvl-head"><span class="lvl-tag">Locked</span><h2>Architectural decisions made this piece</h2></div>
-    <div class="tblwrap">
-      <table>
-        <thead><tr><th>Decision</th><th>Why</th></tr></thead>
-        <tbody>
-          <tr><td>Validator emits a <b>capability profile</b>, not usable/unusable</td><td>A router maps profile → action, so the same validator serves LUMIERE (mask absent = failure) and a future raw-DICOM door (mask absent = expected, routes to segmentation)</td></tr>
-          <tr><td>Adapter seam built now; only LUMIERE implemented</td><td><code>DicomAdapter</code> exists as a real ABC subclass (stubbed) so the two-door design is proven, not asserted</td></tr>
-          <tr><td>Adapter = format-decode only, never processing</td><td>Resample/skull-strip/register/segment stay explicit downstream stages — the loader never transforms pixels</td></tr>
-          <tr><td>Space lives per-image, not per-timepoint</td><td>LUMIERE masks are MNI, raw sequences are native — comparing them directly would falsely flag every case as misaligned</td></tr>
-          <tr><td>Single vs multi-timepoint is the <b>router's</b> job</td><td>N=1 → segment+store, N&gt;1 → segment+RANO; the loader/validator stay agnostic to it</td></tr>
-          <tr><td>Patient-025: manifest-authoritative + flag</td><td>Rather than build fragile zip-reconciliation for an 8↔8 label mismatch that can't be safely auto-mapped</td></tr>
-          <tr><td>External MNI152 identity verification: dropped</td><td>Nothing downstream ever computes against an external reference template — only cohort-internal consistency protects a real failure mode, so that's the only check built</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
+  <p>26 is permissive and merges things that barely touch. 6 is strict and shatters a thin
+    enhancing rim into fragments. We swept both across all 93 practice-arm timepoints, at every
+    volume floor from 0 to 100&nbsp;mm³.</p>
+  <p>The argument that settled it was one neither of us expected. At a 20&nbsp;mm³ floor there are
+    timepoints where <b>6-connectivity ends up with fewer lesions than 26</b>. Connectivity can
+    only ever split things, never merge them — so the only way that happens is that 6-connectivity
+    breaks a real lesion into pieces that each fall under the floor and get thrown away.</p>
+  <div class="keyfact"><b>Decision: 26-connectivity, 20&nbsp;mm³ floor.</b> The floor is anchored,
+    not tuned — 5 to 10× below anything that could satisfy the 10×10&nbsp;mm bar, and about the
+    size of a single native voxel column on a 5&nbsp;mm acquisition. It costs 0.192% of the
+    enhancing volume in the whole arm. Full evidence in
+    <a href="lesion_split_decision.html">the lesion-splitting memo</a>.</div>
+  <div class="gotcha"><b>The trap that comes with the floor.</b> At 20&nbsp;mm³, seven timepoints
+    lose their entire lesion inventory. Those timepoints still <em>have</em> disease — 3 to
+    48&nbsp;mm³ of it. An empty inventory therefore means <b>"no measurable target lesion"</b> and
+    must never be read as "no disease" or allowed to produce a CR. Volumetry never applies the
+    floor; it counts every voxel.</div>
+</section>
 
-  <!-- ============ repo state ============ -->
-  <section>
-    <div class="lvl-head"><span class="lvl-tag">Repo</span><h2>Current state on disk</h2></div>
-    <div class="viewport">
-      <pre><span class="dim"># src/rano/ — package "rano", editable-installed, Python 3.14.4</span>
-<span class="hi">contract/</span>
-  case.py             <span class="dim">Modality · MaskSource · SpaceTag · Space · Geometry · ImageRef · Timepoint · Patient</span>
-<span class="hi">adapters/</span>
-  base.py             <span class="dim">Adapter ABC</span>
-  dicom.py            <span class="dim">DicomAdapter — real subclass, stubbed (seam proof)</span>
-  lumiere/
-    paths.py          <span class="dim">verified zip member-path builders</span>
-    weeks.py          <span class="dim">week-NNN[-M] parse + chronological sort</span>
-    zip_ref.py         <span class="dim">ZipSource, ZipNiftiRef — lazy streaming NIfTI</span>
-    adapter.py         <span class="dim">LumiereAdapter + audit_manifest_vs_zip</span>
-<span class="hi">fingerprint/</span>
-  atlas_consistency.py <span class="dim">check_atlas_consistency — cohort grid check</span>
+<section class="story" id="one">
+  <div class="lvl-head"><span class="lvl-tag">Learned</span><h2>One lesion can look like three</h2></div>
+  <p class="first">Scrolling through slices, a lesion often appears as scattered specks that look
+    like separate things. On Patient-067 at week-109, slice 84 showed the enhancing tumour as
+    three clearly separate patches.</p>
+  <p>They are one lesion. All three belong to the same 3D object, joined through the slices above
+    and below.</p>
 
-<span class="go">tests/  — 42 passed in 0.05s</span>  <span class="dim">(conftest + 6 test modules, no dependency on the 32GB zip)</span>
+  <figure class="fig">
+    <svg viewBox="0 0 680 190" role="img" aria-label="A branching object cut into slices shows disconnected pieces on each slice">
+      <g transform="translate(40,20)">
+        <path d="M70,140 C70,100 40,90 34,55 C30,32 44,20 56,26 M70,140 C70,105 100,92 112,62
+                 C122,38 108,22 94,28 M70,140 C72,112 86,104 92,84"
+              fill="none" stroke="var(--accent)" stroke-width="13" stroke-linecap="round" opacity=".75"/>
+        <line x1="0" y1="60" x2="160" y2="60" stroke="var(--fail)" stroke-width="1.5" stroke-dasharray="5 4"/>
+        <text class="svgt" x="75" y="168" text-anchor="middle">one branching object</text>
+        <text class="svgt" x="172" y="58" text-anchor="start" fill="var(--fail)">cut here</text>
+      </g>
+      <g transform="translate(330,20)">
+        <text class="svgt b" x="150" y="8" text-anchor="middle">what that one cut shows you</text>
+        <circle cx="60" cy="60" r="13" fill="var(--accent)" opacity=".75"/>
+        <circle cx="150" cy="48" r="12" fill="var(--accent)" opacity=".75"/>
+        <circle cx="228" cy="72" r="10" fill="var(--accent)" opacity=".75"/>
+        <text class="svgt" x="150" y="120" text-anchor="middle">three separate patches —</text>
+        <text class="svgt" x="150" y="138" text-anchor="middle">and it is still one object</text>
+      </g>
+    </svg>
+    <figcaption>Cut a tree horizontally and each slice shows a handful of unrelated circles. That
+      does not make it several trees. The connection runs through the slices you are not looking
+      at, so lesions must be labelled in 3D — never slice by slice and stitched.</figcaption>
+  </figure>
 
-<span class="dim"># git — personal identity confirmed (prateek.karkare@gmail.com)</span>
-9442821  Piece 1 (step 2): LUMIERE adapter + atlas-space consistency fingerprint
-6262ad0  Piece 1 (step 1): case contract + ingestion adapter seam
-<span class="dim">   branch ahead of origin/master by 1 commit — not pushed</span></pre>
-    </div>
-  </section>
+  <p>The striking part: that lesion occupies 16 slices and appears as more than one piece on
+    <b>all 16 of them</b>. It is never a single blob anywhere. So a rule like "it is split if it
+    looks split on every slice" would call it split, and be wrong.</p>
+  <div class="keyfact">Across the whole practice arm, <b>50.4%</b> of the slices occupied by a
+    largest lesion show it as more than one disjoint piece. This is the normal case, not an edge
+    case — which is why a ruler may never be drawn across the gap between two pieces on a slice.</div>
+  <p>The reason for the three patches on Patient-067 turned out to be simple: it is a
+    <b>broken ring</b>. The enhancing tissue is a rim around a dead centre, and the rim has gaps
+    in it. Adding the necrosis back gives one region of 371 voxels instead of three arcs of 53,
+    37 and 9.</p>
+</section>
 
-  <!-- ============ remaining ============ -->
-  <section>
-    <div class="lvl-head"><span class="lvl-tag">Ahead</span><h2>What's not built yet</h2></div>
-    <ol class="steps">
-      <li class="done"><b>Contract + adapter ABCs</b> <span class="m">contract/ · adapters/base.py</span></li>
-      <li class="done"><b>LUMIERE adapter</b> <span class="m">adapters/lumiere/</span></li>
-      <li class="wip"><b>Fingerprinter</b> <span class="m">fingerprint/</span><span class="note">Atlas-consistency slice done. Still needed: per-patient geometry/intensity/label-histogram record; full cohort aggregation (the nnU-Net-pattern part beyond this one check).</span></li>
-      <li><b>Validator</b> <span class="m">validate/</span><span class="note">Checks + CapabilityProfile; runner that never raises. Includes the mask↔mask_reference concordance check (cheap now that mask_reference exists).</span></li>
-      <li><b>Router / policy</b> <span class="m">router/policy.py</span><span class="note">profile → reject/process/passthrough; N=1 vs N&gt;1 branch — untestable on LUMIERE alone (no single-timepoint patients exist), needs a synthetic case.</span></li>
-      <li><b>Volumetry slice</b> <span class="m">volumetry/volumes.py</span><span class="note">Reproduce DeepBraTumIA's shipped enhancing/edema mm³ for ≥1 patient within rounding — the "contract is usable" proof.</span></li>
-      <li><b>Validator tests</b> <span class="m">tests/</span><span class="note">Synthetic bad cases: missing modality, misaligned mask, off-schema label. (The 42 existing tests cover contract/adapter, not validator logic yet.)</span></li>
-      <li><b>Cohort QC note</b><span class="note">Formal write-up of what surprised us. Ad hoc findings already in hand: Patient-025, the 12× anisotropy case, zero single-timepoint patients, atlas consistency.</span></li>
-    </ol>
-  </section>
+<section class="story" id="same">
+  <div class="lvl-head"><span class="lvl-tag">Learned</span><h2>Is this the same lesion as last time?</h2></div>
+  <p class="first">Counting lesions on one scan is not enough. RANO needs to know whether a lesion
+    at this visit is the <em>same</em> lesion as last visit — that is what makes a new lesion
+    detectable at all.</p>
+  <p>Every LUMIERE scan is resampled into a standard atlas space, so all of a patient's visits sit
+    on an identical 182×218×182 grid. That suggests something beautifully simple: <b>stack the
+    visits like sheets of tracing paper and hold them up to the light.</b> Overlapping lesions are
+    the same lesion. A lesion whose shadow falls on blank paper is new.</p>
+  <p>It worked beautifully on large lesions and completely failed on small ones. Which sent us
+    looking for why, and that turned out to be the most important thing we found.</p>
+</section>
 
-  <div class="notes">
-    <div class="note"><h4>Package deps</h4><p>numpy 2.5.1, nibabel 5.4.2 installed. pydantic NOT yet installed — deferred to step 4, where config-contract-in / QC-report-out actually need it.</p></div>
-    <div class="note"><h4>Package name</h4><p><code>rano</code> — chosen as a placeholder for "the product, not the dataset." Still cheap to rename if you want something else before more code references it.</p></div>
+<section class="story" id="align">
+  <div class="lvl-head"><span class="lvl-tag">Fixed</span><h2>The scans were never lined up</h2></div>
+  <p class="first">Same grid is not the same as aligned, and the difference had been invisible for
+    the whole project up to this point.</p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 680 200" role="img" aria-label="Identical graph paper, but the drawing placed differently on each sheet">
+      <g transform="translate(70,24)">
+        <text class="svgt b" x="90" y="-6" text-anchor="middle">visit 1</text>
+        <g fill="none" stroke="var(--line)" stroke-width="1">
+          <rect x="0" y="0" width="180" height="140"/>
+          <line x1="36" y1="0" x2="36" y2="140"/><line x1="72" y1="0" x2="72" y2="140"/>
+          <line x1="108" y1="0" x2="108" y2="140"/><line x1="144" y1="0" x2="144" y2="140"/>
+          <line x1="0" y1="35" x2="180" y2="35"/><line x1="0" y1="70" x2="180" y2="70"/>
+          <line x1="0" y1="105" x2="180" y2="105"/>
+        </g>
+        <ellipse cx="84" cy="66" rx="50" ry="42" fill="var(--accent)" opacity=".25"
+                 stroke="var(--accent)" stroke-width="2"/>
+        <circle cx="84" cy="66" r="3" fill="var(--accent)"/>
+      </g>
+      <g transform="translate(370,24)">
+        <text class="svgt b" x="90" y="-6" text-anchor="middle">visit 2 — same grid, brain sits elsewhere</text>
+        <g fill="none" stroke="var(--line)" stroke-width="1">
+          <rect x="0" y="0" width="180" height="140"/>
+          <line x1="36" y1="0" x2="36" y2="140"/><line x1="72" y1="0" x2="72" y2="140"/>
+          <line x1="108" y1="0" x2="108" y2="140"/><line x1="144" y1="0" x2="144" y2="140"/>
+          <line x1="0" y1="35" x2="180" y2="35"/><line x1="0" y1="70" x2="180" y2="70"/>
+          <line x1="0" y1="105" x2="180" y2="105"/>
+        </g>
+        <ellipse cx="84" cy="66" rx="50" ry="42" fill="none" stroke="var(--line)"
+                 stroke-width="1.5" stroke-dasharray="4 4"/>
+        <ellipse cx="100" cy="78" rx="50" ry="42" fill="var(--warn)" opacity=".22"
+                 stroke="var(--warn)" stroke-width="2" transform="rotate(7 100 78)"/>
+        <circle cx="100" cy="78" r="3" fill="var(--warn)"/>
+        <line x1="84" y1="66" x2="100" y2="78" stroke="var(--warn)" stroke-width="1.5"/>
+      </g>
+      <text class="svgt" x="340" y="188" text-anchor="middle">the paper is identical — the drawing is not in the same place on it</text>
+    </svg>
+    <figcaption>Two photographs of the same person traced onto identical graph paper. Square
+      (40,&nbsp;30) means the same square on both sheets. But if the photographs were laid down
+      slightly differently, the nose is at (40,&nbsp;30) on one and (42,&nbsp;33) on the other.</figcaption>
+  </figure>
+
+  <p>Each visit was registered to the standard template <b>independently</b>, and those
+    registrations disagree with each other. The existing fingerprint check verifies that every
+    image shares one grid, and it passes — correctly. It just never compared the contents.</p>
+  <p>The control is the brain itself: a patient's brain does not wander between visits, so any
+    mismatch is ours.</p>
+  <div class="keyfact">Consecutive visits' brain masks overlap only <b>91%</b>, and the brain's
+    centre of mass sits about <b>2.7&nbsp;mm</b> out (worst case 10.2&nbsp;mm).</div>
+  <p>Three other explanations were tested and each ruled out by its own number:</p>
+  <div class="tblwrap"><table>
+    <thead><tr><th>Could it be…</th><th>Then we would see</th><th>We measured</th></tr></thead>
+    <tbody>
+      <tr><td>inconsistent skull-stripping</td><td>different brain volumes</td>
+        <td class="v-ok">volumes agree to within 1%</td></tr>
+      <tr><td>scans covering different amounts of head</td><td>different brain heights</td>
+        <td class="v-ok">85 of 86 pairs agree within 10&nbsp;mm</td></tr>
+      <tr><td>the tumour reshaping the brain</td><td>mismatch clustered at the lesion</td>
+        <td class="v-ok">only 4% within a centimetre of it</td></tr>
+    </tbody>
+  </table></div>
+  <p>Same size, same height, and the disagreement nowhere near the disease. The clincher:
+    Patient-067's brain runs from z=26 to z=155 at week-053 and from z=17 to z=145 six weeks
+    later — the same height to within a millimetre, sitting <b>nine millimetres lower</b>.</p>
+
+  <div class="qa">
+    <div class="q">Why did this stay hidden for so long?</div>
+    <p>Everything built before this measures <b>volume</b>, and a voxel count does not care where
+      the voxels are. You can count a tumour perfectly on a scan that is a centimetre out of
+      place. The first operation that cared about position was asking whether a lesion is the same
+      one as last time. Registration was always <em>Piece 2</em> in the roadmap and explicitly
+      flagged as a dependency for new-lesion detection — we simply arrived at it from a side door
+      while chasing a ruler that gave the wrong answer.</p>
   </div>
 
-  <footer>LUMIERE volumetric-RANO · Piece 1 progress · generated from verified session state, not memory.</footer>
+  <p>A plain shift does not fix it — sliding the brains together recovers only 22% of what is
+    missing, because the head is also <b>tilted</b>. The typical fit turns it by 3.3 degrees, one
+    by nearly 18. So we added SimpleITK and built proper rigid registration: six numbers per
+    visit, three to slide and three to turn, matched on <b>brain minus lesion</b> (the tumour is
+    the thing that changed, so letting it drive the fit means pulling everything else out of true).</p>
+  <div class="keyfact">All 93 visits registered in 74 seconds. Brain overlap <b>91.0% →
+    95.1%</b>, worst case 69.6% → 85.6%, and nothing made worse. The number that mattered: how
+    much of a lesion lands on the same lesion next visit, for lesions under 500&nbsp;mm³, went
+    from <b>4% to 30%</b>. Large lesions went 90% → 98%.</div>
+  <div class="gotcha"><b>The check that earned its keep on day one.</b> The first run registered
+    three visits with an <b>80&nbsp;mm</b> shift and the optimiser reported convergence for all
+    three — from the inside it looked exactly like the successful ones. Nothing but asking
+    "did the brains actually end up better aligned?" catches that. Every fit is now judged on
+    that outcome; failures fall back to a plain slide or are left unregistered and flagged.
+    3 of 93 needed it.</div>
+</section>
+
+<section class="story" id="newlesion">
+  <div class="lvl-head"><span class="lvl-tag">Open</span><h2>New lesions: still unsolved, and we know why</h2></div>
+  <p class="first">Registration was supposed to unlock new-lesion detection. It did not, and the
+    reason is worth writing down carefully because it rules out a whole family of fixes.</p>
+  <p>Our rule asks: <em>does this lesion overlap anything from last time?</em> If not, it is new.
+    Here is where the newly-enhancing tissue actually sits, relative to the previous visit's
+    tumour, at the visits the radiologist called new:</p>
+  <div class="viewport"><pre>week-013   10,167 mm³ of new tissue     <span class="hi">6.7 mm</span> away    radiologist: NEW
+week-055      184 mm³                   <span class="hi">1.8 mm</span> away    radiologist: NEW
+week-073    1,401 mm³                   <span class="hi">0.2 mm</span> away    radiologist: NEW
+week-105      783 mm³                   <span class="hi">0.4 mm</span> away    radiologist: NEW
+
+week-120   56,247 mm³                  <span class="go">87.6 mm</span> away    (we DID catch this one)</pre></div>
+  <p>Read the last row against the rest. When disease appeared right across the brain, our rule
+    caught it without difficulty. Every other time the new tissue is <b>touching</b> the old
+    tumour — a fifth of a millimetre away, in one case. Something touching the old tumour overlaps
+    it, so the rule says "same lesion", correctly by its own definition, every single time.</p>
+  <p>You cannot align your way out of two things being in contact. Registration was <em>a</em>
+    blocker, not <em>the</em> blocker.</p>
+  <div class="openq"><b>And distance carries no signal.</b> Across the arm, the distance from the
+    old tumour to the newest enhancing tissue is a median <b>3.5&nbsp;mm</b> when they call it a
+    new lesion and <b>3.6&nbsp;mm</b> when they call it ordinary growth. Volume of new tissue is
+    worse than useless — one visit they called plain growth had forty times more new tissue than
+    a visit they called a new lesion.</div>
+
+  <div class="qa">
+    <div class="q">So what are the radiologists actually doing?</div>
+    <p>Their own words give it away. Across 501 rationales they write <code>less than 3
+      months</code> 25 times, and repeatedly note whether something is <code>within the irradiated
+      area</code> or <code>outside of irradiation field</code>. One entry reads <em>"dural
+      recurrence despite within 3 months of radiochemotherapy"</em>.</p>
+    <p>They are answering a question we never asked: <b>is this enhancement even tumour?</b> After
+      surgery a patient gets radiotherapy, and irradiated tissue lights up on contrast exactly
+      like tumour does. New enhancement inside the treated area, soon after treatment, is often
+      not cancer at all. Outside the field, radiation cannot explain it — so it is real disease.</p>
+    <p>They use three things we do not have: <b>when radiotherapy happened</b> (roughly
+      recoverable from week numbers), <b>the radiation dose map</b> (not in this dataset), and
+      <b>perfusion imaging</b> (not in this dataset — LUMIERE has T1, contrast T1, T2 and FLAIR).</p>
+  </div>
+
+  <p>We approximated the field — post-operative cavity plus residual tumour, grown by a margin —
+    and asked whether new enhancement fell inside or outside it. <b>It did not separate them.</b>
+    At every margin, roughly the same proportion of "new lesion" visits and "ordinary growth"
+    visits had tissue outside the zone. As a rule it scored 41% precision against a 31% base rate,
+    worse than the connectivity rule it was meant to beat.</p>
+  <div class="gotcha"><b>Why that attempt was doomed, in hindsight.</b> Only 39 of 501 rationales
+    invoke the field or the clock at all — under 8%. We found a genuine piece of domain reasoning
+    and over-weighted it into the main mechanism. It applies in a specific early window, and there
+    are only seven such visits in the whole practice arm.</div>
+
+  <div class="tblwrap"><table>
+    <thead><tr><th>Scoreboard, 70 assessable transitions</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>They report a new lesion at 22 visits; we catch…</td><td class="num v-flag">8 (36%)</td></tr>
+      <tr><td>We report one at 16 visits; confirmed…</td><td class="num v-flag">8 (50%)</td></tr>
+      <tr><td>Both agree nothing happened</td><td class="num v-ok">40</td></tr>
+      <tr><td>New object above <b>500&nbsp;mm³</b>, confirmed by the radiologist</td><td class="num v-ok">5 of 5</td></tr>
+    </tbody>
+  </table></div>
+  <div class="keyfact"><b>What we do have.</b> A new object above 500&nbsp;mm³ that overlaps
+    nothing before was confirmed by the radiologist 5 times out of 5. High confidence, covering
+    just under a quarter of cases. Keep it — but <b>its silence must never be read as "no new
+    lesion"</b>.</div>
+  <div class="openq"><b>Where we stopped, deliberately.</b> Three features tried — connectivity,
+    distance, treated field — and none separate a new lesion from ordinary growth. Rather than
+    reach for a fourth, the next step is to check whether the information is in the mask at all:
+    open three or four of the 14 missed visits in the browser and look at the MRI beside the mask.
+    Either there is a visible nodule the segmentation never marked (the ceiling is DeepBraTumIA,
+    and no cleverness over this mask recovers it), or it is marked and we are failing to isolate
+    it. We do not yet know which, and every downstream decision depends on the answer.</div>
+</section>
+
+<section class="story" id="ruler">
+  <div class="lvl-head"><span class="lvl-tag">Built</span><h2>Measuring a lesion</h2></div>
+  <p class="first">On each axial slice: the longest straight line across the lesion, then the
+    longest line at right angles to it. Multiply. Keep the slice with the biggest product. Four
+    decisions turned out to be load-bearing.</p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 680 215" role="img" aria-label="Measuring a ring with the ruler confined to the rim, versus after filling the hole">
+      <text class="svgt b" x="170" y="16" text-anchor="middle">ruler must stay on tumour tissue</text>
+      <text class="svgt b" x="510" y="16" text-anchor="middle">fill the hole, then measure</text>
+      <g transform="translate(170,105)">
+        <circle cx="0" cy="0" r="58" fill="none" stroke="var(--accent)" stroke-width="22" opacity=".65"/>
+        <line x1="-43" y1="-39" x2="43" y2="-39" stroke="var(--fail)" stroke-width="2.5"/>
+        <line x1="0" y1="-58" x2="0" y2="-39" stroke="var(--fail)" stroke-width="2.5"/>
+        <text class="svgt" x="0" y="-16" text-anchor="middle" fill="var(--fail)">22 × 5</text>
+        <text class="svgt" x="0" y="82" text-anchor="middle">= 112 mm²</text>
+      </g>
+      <g transform="translate(510,105)">
+        <circle cx="0" cy="0" r="69" fill="var(--accent)" opacity=".22"/>
+        <circle cx="0" cy="0" r="58" fill="none" stroke="var(--accent)" stroke-width="22" opacity=".65"/>
+        <line x1="-69" y1="0" x2="69" y2="0" stroke="var(--pass)" stroke-width="2.5"/>
+        <line x1="0" y1="-69" x2="0" y2="69" stroke="var(--pass)" stroke-width="2.5"/>
+        <text class="svgt" x="0" y="82" text-anchor="middle">30 × 30 = 900 mm²</text>
+      </g>
+      <text class="svgt" x="340" y="205" text-anchor="middle">same lesion, eight times the number — the sideways line is what collapses</text>
+    </svg>
+    <figcaption>On a ring-enhancing tumour the long line barely suffers; it just skims past the
+      hole. The line at right angles has nowhere to go but across the thickness of the rim. So a
+      ring must be measured through its middle, the way the size of an apple includes its core.</figcaption>
+  </figure>
+
+  <ol class="steps">
+    <li><b>Both lines stay inside the tissue.</b> A caliper you could not physically draw on the
+      image is not a measurement. Free on a normal blobby cross-section; on an L-shape the
+      unconstrained caliper reads 42.4&nbsp;mm by cutting across the empty corner instead of
+      31.6&nbsp;mm. The overshoot is kept as a <b>shape warning</b> — 0.00&nbsp;mm on the median
+      real cross-section, firing on 3 of 17.</li>
+    <li><b>One contiguous piece at a time.</b> Half of all slices show a lesion as several
+      islands. A ruler across two of them measures the healthy brain between.</li>
+    <li><b>Enclosed holes filled first</b> — and only what the tissue completely surrounds. A
+      surgical cavity open along one side never fills, because the fill runs out of the opening.
+      That is why this is safe and why simply adding the necrosis label is not: label 2 holds
+      resection cavities <em>many times larger</em> than the tumour around them (Patient-062:
+      1,631&nbsp;mm³ of tumour beside 73,661&nbsp;mm³ of "necrosis").</li>
+    <li><b>Lengths between voxel corners.</b> Ten 1&nbsp;mm voxels measure 10.0&nbsp;mm, not the
+      9.0&nbsp;mm you get centre-to-centre. On a 10&nbsp;mm threshold, that millimetre decides
+      measurability.</li>
+  </ol>
+
+  <p>The perpendicular was wrong twice before it was tested properly — the first version returned
+    zero on every shape — and both times the numbers it produced on real lesions looked perfectly
+    reasonable. <b>Plausible is not correct.</b> So it is now checked against shapes whose answers
+    are known before measuring: see <a href="ruler_validation.html">the validation page</a>, where
+    every shape is drawn with the lines the code actually chose on it.</p>
+  <div class="keyfact"><b>Curved shapes read about one voxel high; grid-aligned shapes read
+    exactly right.</b> That is true of the mask, not a fault in the ruler — a rasterised circle
+    genuinely is bigger than the smooth circle it came from, because the voxels near its diagonal
+    stick out past the boundary. It does not upset the 10&nbsp;mm gate, because the gate needs
+    <em>both</em> lines over 10&nbsp;mm and the perpendicular is the less inflated: a true
+    10.0&nbsp;mm disc passes, a 9.5&nbsp;mm one does not.</div>
+
+  <p>Against the 18 real measurements the radiologists wrote down:</p>
+  <div class="tblwrap"><table>
+    <thead><tr><th>Where we measured…</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>the <b>same lesion</b> they did (6 of 17)</td>
+        <td class="num v-ok">long axis median +1.2&nbsp;mm, perpendicular +0.5&nbsp;mm</td></tr>
+      <tr><td>the measurability gate vs their written numbers</td><td class="num v-ok">agrees 14 / 17</td></tr>
+      <tr><td>a <b>different lesion</b> (11 of 17)</td><td class="num v-flag">all lesion-identity, none a ruler error</td></tr>
+    </tbody>
+  </table></div>
+  <p>That <b>+1.2&nbsp;mm</b> is the same one voxel the synthetic shapes predicted. The phantoms
+    told us what to expect and the real data agreed — which is the strongest evidence we have that
+    the ruler is sound.</p>
+  <div class="openq"><b>Every remaining disagreement is about which lesion, not how it was
+    measured.</b> Two causes, both already familiar. We <em>merge lesions they keep apart</em> —
+    Patient-031 week-190, where the radiologist wrote three separate measurements and our
+    26-connectivity produced one 46,000&nbsp;mm³ object measuring 82×45. And we <em>point at the
+    wrong lesion</em> — the biggest one, while they follow a target chosen at an earlier visit and
+    demoted when it shrank. Neither is fixed by a better ruler.</div>
+</section>
+
+<section class="story" id="state">
+  <div class="lvl-head"><span class="lvl-tag">State</span><h2>What is solid, what is open</h2></div>
+
+  <div class="qa">
+    <div class="q">The one open problem, stated plainly</div>
+    <p>Two separate failures turned out to be the same problem wearing different hats:
+      <b>we do not know which lesion to point at.</b></p>
+    <p>Follow Patient-072 and you can watch a radiologist work. At week-013 they
+      <em>pick</em> a lesion and measure it: 19×12. It grows — 26×19, then 36.5×18.5. At week-037
+      it shrinks by more than half and they write <em>"Target L. to non-target L."</em> — they
+      <b>demote</b> it and stop measuring. Two visits later something new appears and they
+      <b>promote</b> it: 13×11.5. From then on that is the one they follow.</p>
+    <p>The old lesion is still sitting there, still the biggest enhancing object in the scan. They
+      walk past it every visit. So the target lesion is not the biggest, or the roundest, or the
+      brightest — it is <b>whichever one was chosen earlier and has not been demoted yet</b>. That
+      is a piece of history, not a piece of geometry, and you cannot recover it from one scan.</p>
+  </div>
+
+  <div class="tblwrap"><table>
+    <thead><tr><th>Component</th><th>State</th><th>Evidence</th></tr></thead>
+    <tbody>
+      <tr><td>Loader, validator, contract, adapters</td><td class="v-ok">solid</td>
+        <td>91 patients / 638 timepoints reconcile exactly with the manifest; 1,773 / 1,773
+          atlas images share one grid. See <a href="piece1_readiness.html">Piece 1 closeout</a>.</td></tr>
+      <tr><td>Volumetry in atlas space</td><td class="v-ok">solid</td>
+        <td>Unbiased; precision depends on lesion <em>size</em>, not compartment. Sub-1&nbsp;cm³
+          lesions on thick slices swing widely — exactly the RANO-threshold range.</td></tr>
+      <tr><td>Lesion splitting</td><td class="v-ok">decided</td>
+        <td>26-connectivity + 20&nbsp;mm³ floor, swept over 93 timepoints.</td></tr>
+      <tr><td>Intra-patient registration</td><td class="v-ok">solid</td>
+        <td>Brain overlap 91 → 95%, 0/93 made worse, outcome-checked with fallbacks.</td></tr>
+      <tr><td>Bidimensional ruler</td><td class="v-ok">solid</td>
+        <td>Validated on shapes with known answers; +1.2&nbsp;mm median against real expert
+          measurements, exactly as the phantoms predicted.</td></tr>
+      <tr><td>Target selection over time</td><td class="v-flag">open</td>
+        <td>Radiologists promote and demote targets across visits. "Biggest lesion" is right for
+          some patients and wrong for Patient-072 at every visit.</td></tr>
+      <tr><td>New-lesion detection</td><td class="v-flag">open</td>
+        <td>36% recall, 50% precision. High-confidence signal only above 500&nbsp;mm³.</td></tr>
+      <tr><td>Over-merging</td><td class="v-flag">open</td>
+        <td>Patient-031 week-190: they measured three lesions, we produced one. Flagged in the
+          splitting memo as the failure nothing protects against; now observed.</td></tr>
+      <tr><td>T2/FLAIR component</td><td class="v-flag">off</td>
+        <td>Non-discriminative at every threshold. Kept as an ablation, not in the default rule.</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="gotcha"><b>Standing rules that are easy to forget and expensive to break.</b>
+    Volumetry never applies the lesion floor. An empty lesion inventory means "no measurable
+    target", never CR. Post-Op and Pre-Op scans are not assessable timepoints — comparing lesions
+    across a surgery is meaningless, and the cohort lock says so. The held-out arm (17 patients)
+    is never inspected. The expert ratings are <b>one</b> neuroradiologist's reading, not a
+    consensus — we are fitting one person's judgement, and RANO reproducibility between readers
+    is a known weak point in the field.</div>
+</section>
+
+<section class="story" id="restart">
+  <div class="lvl-head"><span class="lvl-tag">Restart</span><h2>Picking this back up</h2></div>
+  <p class="first">Everything below regenerates from the repo. <code>output/</code> is deliberately
+    untracked — it is all reproducible, so if a JSON is missing, run its script.</p>
+  <div class="viewport"><pre><span class="dim"># look at the masks — slice browser and 3D lesion view, practice arm only</span>
+.venv/bin/python scripts/mask_browser.py        <span class="dim"># localhost:8760, and /3d</span>
+
+<span class="dim"># lesion splitting: sweep, tables, and the decision memo</span>
+.venv/bin/python scripts/sweep_connectivity.py
+.venv/bin/python scripts/summarize_connectivity_sweep.py
+.venv/bin/python scripts/render_lesion_split_decision.py
+
+<span class="dim"># registration: six numbers per visit + QC (74s for all 93)</span>
+.venv/bin/python scripts/run_registration.py
+
+<span class="dim"># the ruler: validation drawings, then the comparison with the radiologists</span>
+.venv/bin/python scripts/render_ruler_validation.py
+.venv/bin/python scripts/run_measurement.py
+
+<span class="dim"># everything</span>
+.venv/bin/python -m pytest -q                   <span class="go"># 181 passing</span></pre></div>
+
+  <div class="qa">
+    <div class="q">If you only remember four things</div>
+    <p><b>1.</b> A mask tells you which voxels are tumour. It never tells you how many tumours, or
+      which one is the same as last time. Everything hard lives in that gap.</p>
+    <p><b>2.</b> Same grid is not the same as aligned. Volume is blind to position, so this hid
+      for the whole project until the first question that cared about position.</p>
+    <p><b>3.</b> Test geometry against shapes whose answers you know <em>before</em> measuring
+      them. Plausible numbers on real data hide broken code — twice, here.</p>
+    <p><b>4.</b> Do not trust a fit because the optimiser says it converged. Check the outcome it
+      was supposed to improve. Three 80&nbsp;mm registration failures reported success.</p>
+  </div>
+</section>
+
 </div>
