@@ -29,8 +29,26 @@ HONEST GAPS -- these defaults are not all equally well founded:
     Re-enable it when the T2 signal is non-enhancing TUMOUR rather than the whole oedema
     compartment, and re-measure before trusting it.
   * ``min_absolute_change_mm3``: a guard of our own, not RANO. A 0.4 cm3 lesion can swing tens of
-    percent on slice-thickness alone, so a pure ratio makes noise look like progression. Default
-    0.0 -- OFF -- because turning it on without calibration trades one bias for another.
+    percent on slice-thickness alone, so a pure ratio makes noise look like progression. SWEPT ON
+    LUMIERE (2026-09-02, 74 patients / 221 timepoints, held-out arm excluded; scripts/
+    sweep_guards.py) over 0 - 1000 mm3:
+
+        0 - 40 mm3     IDENTICAL output. Not one scored call in the cohort turns on a change
+                       this small, so the "one voxel scored as progression" failure mode is real
+                       in principle and has zero incidence here.
+        45 - 150 mm3   agreement flat, balanced accuracy +4 pp -- but the entire gain is TWO
+                       timepoints in ONE patient (059), and it is bought by turning a correct PD
+                       into a wrong SD in another. One patient is not a calibration.
+        >= 200 mm3     four correct PD calls destroyed. Clearly too high.
+
+    Default 10.0 -- roughly 2-10 ACQUIRED voxels (native voxels on this cohort run 1-5 mm3; the
+    1 mm atlas grid is resampled, not acquired). Chosen as the largest value that provably changes
+    nothing, so the guard states the intent without buying agreement it cannot defend.
+
+    ``min_absolute_change_mm3`` is NOT the measurability gate and cannot become one: finding F3 of
+    the 2026-08-31 adjudication shows measurability is a SHAPE test (>=10 mm in two perpendicular
+    axes) that no volume threshold can express -- a 30x30x3 mm pancake is 1,414 mm3 and not
+    measurable, a 12x11x10 mm blob is 691 mm3 and is. This is a noise floor and nothing more.
 
 References:
   Wen et al. (2010), J Clin Oncol 28:1963 -- RANO high-grade glioma criteria (bidimensional).
@@ -77,6 +95,26 @@ class ResponseCriteria:
     """RANO requires CR and PR to be confirmed by a repeat scan. Unconfirmed responses become SD."""
     confirmation_weeks: float = 4.0
     """Minimum interval to the confirming scan."""
+    confirmation_max_weeks: float | None = 16.0
+    """Maximum interval to the confirming scan. RANO writes only a MINIMUM ("at least 4 weeks"),
+    which read literally makes the next scan a confirmation however far away it is. MEASURED ON
+    LUMIERE (2026-08-31 adjudication, finding F2): of 45 confirmation-driven demotions the gap to
+    the confirming scan ran 4, 4, 5, ... 20, 27, 42, 50 weeks. A scan 42 weeks later is not
+    confirming a response, it is the next chapter of the disease -- and the demotion it caused was
+    wrong in 30 of the 45.
+
+    Default 16.0. Glioma follow-up on this cohort runs every 8-12 weeks, so 16 admits the next
+    scheduled scan plus a slipped one and rejects a scan a whole extra interval away. SWEPT
+    (2026-09-02, same 221 timepoints as above): 12 wk and below loses SD recall, 16-18 wk is a flat
+    optimum, 19 wk and above decays back to the unlimited behaviour. The swept optimum and the
+    scheduling argument agree, which is the only reason to trust either -- the measured margin over
+    unlimited is +1.2 pp balanced accuracy off a net of ONE timepoint, which on its own would be
+    noise. Take this fix for correctness, not for the number.
+
+    When the first scan at least ``confirmation_weeks`` out falls beyond this limit, nothing in the
+    record can confirm OR refute the response. The call is then KEPT and flagged
+    ``confirmation_too_late``, never demoted -- absence of evidence is recorded as absence of
+    evidence. ``None`` restores the unlimited pre-2026-09 behaviour."""
     confirm_at_end_of_followup: bool = True
     """What to do with a response at the last scan, where confirmation is impossible. True keeps
     the call and flags it; False downgrades it to SD. Keeping it avoids systematically penalising
@@ -85,12 +123,12 @@ class ResponseCriteria:
     pseudoprogression_weeks: float | None = 12.0
     """Post-radiotherapy window in which a new or growing enhancing lesion is as likely to be
     treatment effect as tumour. ``None`` disables the concept."""
-    pseudoprogression_policy: PseudoprogressionPolicy = "flag"
+    pseudoprogression_policy: PseudoprogressionPolicy = "downgrade"
     """``flag`` records the risk and keeps the PD call. ``downgrade`` turns such a PD into SD,
     which is the strict RANO reading (PD in-window needs histology or an out-of-field lesion)."""
 
     # --- guards ------------------------------------------------------------------------
-    min_absolute_change_mm3: float = 0.0
+    min_absolute_change_mm3: float = 10.0
     """Changes smaller than this in absolute terms never trigger PD or PR, whatever the ratio."""
     block_pr_when_non_measurable: bool = True
     """RANO forbids PR on non-measurable disease; PD and SD stay available."""

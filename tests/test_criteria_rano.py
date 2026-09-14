@@ -227,6 +227,75 @@ def test_scan_too_soon_does_not_confirm():
     assert calls["t1"] is Response.SD
 
 
+def test_confirming_scan_beyond_the_upper_limit_keeps_the_call_and_flags_it():
+    """A scan 42 weeks out is the next chapter of the disease, not a confirmation of this one.
+
+    Demoting on it reads "we have no evidence" as "the response failed" -- the two are different,
+    and only one of them is in the data. t2 scores PD and would demote t1 under the old unlimited
+    search; at a 16-week limit it is simply not a candidate.
+    """
+    traj = [
+        tp("t0", 10000.0, week=0),
+        tp("t1", 2000.0, week=8),    # PR: -80% vs baseline
+        tp("t2", 9000.0, week=50),   # +350% vs nadir -> PD, but 42 weeks later
+    ]
+    a = next(a for a in assess_trajectory("p", traj, MRANO_VOLUMETRIC).assessments if a.timepoint == "t1")
+    assert a.call is Response.PR
+    assert a.provisional_call is None       # kept, not demoted
+    assert "confirmation_too_late" in a.unknowns
+    assert "+42 wk" in a.reason
+
+
+def test_a_scan_inside_the_upper_limit_still_refutes_a_response():
+    """The limit must not become a blanket amnesty: an in-window scan that scores PD still demotes."""
+    traj = [
+        tp("t0", 10000.0, week=0),
+        tp("t1", 2000.0, week=8),
+        tp("t2", 9000.0, week=22),   # +14 wk, inside the 16-week limit
+    ]
+    a = next(a for a in assess_trajectory("p", traj, MRANO_VOLUMETRIC).assessments if a.timepoint == "t1")
+    assert a.call is Response.SD
+    assert a.provisional_call is Response.PR
+    assert "confirmation_too_late" not in a.unknowns
+
+
+def test_the_upper_limit_is_applied_to_the_earliest_candidate_not_the_best_one():
+    """t2 is too late to confirm, so the search stops there. It must NOT skip on to t3 -- picking a
+    later scan because the nearer one is inconvenient is exactly the rebound-confirmation bug the
+    'first eligible scan' rule exists to prevent."""
+    traj = [
+        tp("t0", 10000.0, week=0),
+        tp("t1", 2000.0, week=8),
+        tp("t2", 9000.0, week=40),   # too late (+32 wk), and it is PD
+        tp("t3", 1900.0, week=44),   # would "confirm" if the search were allowed to continue
+    ]
+    a = next(a for a in assess_trajectory("p", traj, MRANO_VOLUMETRIC).assessments if a.timepoint == "t1")
+    assert a.call is Response.PR
+    assert "confirmation_too_late" in a.unknowns
+
+
+def test_upper_limit_of_none_restores_the_unlimited_search():
+    criteria = MRANO_VOLUMETRIC.variant("unlimited", confirmation_max_weeks=None)
+    traj = [tp("t0", 10000.0, week=0), tp("t1", 2000.0, week=8), tp("t2", 9000.0, week=50)]
+    a = next(a for a in assess_trajectory("p", traj, criteria).assessments if a.timepoint == "t1")
+    assert a.call is Response.SD
+    assert a.provisional_call is Response.PR
+
+
+def test_no_later_scan_at_all_is_a_different_flag_from_one_that_is_too_late():
+    """Both are unconfirmable and both keep the call, but they are distinguishable in the output --
+    one is a follow-up that ended, the other a follow-up with a hole in it."""
+    ended = assess_trajectory("p", [tp("t0", 10000.0, week=0), tp("t1", 2000.0, week=8)],
+                              MRANO_VOLUMETRIC).assessments[-1]
+    hole = next(a for a in assess_trajectory(
+        "p", [tp("t0", 10000.0, week=0), tp("t1", 2000.0, week=8), tp("t2", 1900.0, week=50)],
+        MRANO_VOLUMETRIC).assessments if a.timepoint == "t1")
+    assert "confirmation_followup" in ended.unknowns
+    assert "confirmation_too_late" not in ended.unknowns
+    assert "confirmation_too_late" in hole.unknowns
+    assert "confirmation_followup" not in hole.unknowns
+
+
 def test_response_at_end_of_followup_is_kept_and_flagged():
     """Downgrading every trajectory's last scan penalises follow-up length, not biology."""
     traj = [tp("t0", 10000.0, week=0), tp("t1", 2000.0, week=8)]
@@ -247,18 +316,24 @@ def test_end_of_followup_downgrade_when_configured():
 # pseudoprogression
 # --------------------------------------------------------------------------------------
 
-def test_pseudoprogression_window_flags_but_keeps_the_call_by_default():
+def test_pseudoprogression_window_downgrades_progression_by_default():
+    """The shipped policy is ``downgrade``: growth inside the post-radiotherapy window is not
+    callable as PD without histology or an out-of-field lesion. The PD is preserved as the
+    provisional call so the downgrade is auditable rather than invisible."""
     m = tp("t", 9000.0, weeks_since_rt=4.0)
     a = assess_timepoint(m, ReferenceState(10000.0, 5000.0), MRANO_VOLUMETRIC)
-    assert a.call is Response.PD
+    assert a.call is Response.SD
+    assert a.provisional_call is Response.PD
     assert a.pseudoprogression_risk
 
 
-def test_pseudoprogression_downgrade_policy():
-    criteria = MRANO_VOLUMETRIC.variant("strict", pseudoprogression_policy="downgrade")
+def test_pseudoprogression_flag_policy_keeps_the_call():
+    """``flag`` is the permissive reading and never changes a call -- which is exactly why it
+    measured as contributing nothing. Kept as the ablation that shows what the window is worth."""
+    criteria = MRANO_VOLUMETRIC.variant("permissive", pseudoprogression_policy="flag")
     a = assess_timepoint(tp("t", 9000.0, weeks_since_rt=4.0), ReferenceState(10000.0, 5000.0), criteria)
-    assert a.call is Response.SD
-    assert a.provisional_call is Response.PD
+    assert a.call is Response.PD
+    assert a.pseudoprogression_risk
 
 
 def test_outside_the_window_is_not_flagged():
