@@ -64,6 +64,17 @@ arm only**; the 17 held-out patients are never opened.
 | `treated_zone.py` | Radiologists ask whether new enhancement falls inside the radiation field. Can we approximate that? | No. Both groups move together at every margin; 41% precision against a 31% base rate. |
 | `rationale_vocabulary.py` | How often do the notes actually reason about the field or the 3-month clock? | About **1 in 10** notes. A real consideration, but a minority one — which is why the field feature could not carry the problem. |
 
+## 6. The doctor said progression, the pipeline said response
+
+Written up in `docs/FINDINGS_2026-09-14.md`. **Unlike the scripts above, these also read the 67
+unassigned patients** (outside the locked cohort, so not restricted). Held-out patients enter only
+as aggregate counts; every per-case detail is read after they are filtered out.
+
+| Script | Question | What it found |
+|---|---|---|
+| `pd_called_as_response.py` | 13 scans are expert PD but pipeline CR/PR. Rule bug, or something the rule cannot see? | No rule fix reaches agreement. 2 are a real bug — **PR with no measurable baseline** (the rule never calls the ruler). 3 rest on T2 progression, which fires on **21 of 25** expert CRs. A CR call means enhancing is exactly 0. |
+| `segmenter_miss_figures.py` | Patient-070's doctor measured 12 × 10 mm; the mask says 0. Is the lesion there? | Yes. A nodule at week 44 grows into a 28 × 22 mm ring by week 61, and **both** segmenters report 0 mm³ at week 44. Also draws Patient-090's T2 progression. |
+
 ---
 
 ## Not here, and why
