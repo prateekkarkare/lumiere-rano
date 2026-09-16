@@ -48,6 +48,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
 from rano.adapters.lumiere import weeks  # noqa: E402
+from rano.adapters.lumiere.treatment import read_surgical_labels, treatment_from_labels  # noqa: E402
 from rano.criteria import (  # noqa: E402
     PROFILES,
     CallPair,
@@ -62,6 +63,8 @@ from rano.criteria import (  # noqa: E402
     format_timeline,
     split_by_group,
 )
+from rano.contract.treatment import TreatmentRecord  # noqa: E402
+from rano.criteria.timeline import BaselinePolicy, choose_baseline  # noqa: E402
 
 DEFAULT_ZIP = ROOT / "Imaging-v202211.zip"
 DEFAULT_VOLUMES_CSV = ROOT / "output" / "volume_audit" / "volumes.csv"
@@ -202,6 +205,9 @@ def build_trajectories(
     volumes: dict[tuple[str, str], dict[str, float]],
     expert: dict[tuple[str, str], ExpertRow],
     rt_end_week: float,
+    *,
+    surgical: dict | None = None,
+    policy: BaselinePolicy = BaselinePolicy(),
 ) -> dict[str, tuple[TimepointMeasurement | None, list[TimepointMeasurement]]]:
     """patient -> (reference scan or None, chronological measurements to score).
 
@@ -214,6 +220,17 @@ def build_trajectories(
 
     Timepoints with volumes but no expert row are kept for the same reason: dropping them would
     hide a real nadir and make later progression unreachable.
+
+    TWO WAYS TO PICK THE REFERENCE
+        Default (``surgical is None``): the first study the expert labelled Post-Op, matched by
+        timepoint LABEL, and one cohort-wide ``rt_end_week`` for the pseudoprogression window.
+
+        With ``surgical`` (the Pre-Op/Post-Op labels): the patient's own treatment record is
+        rebuilt (surgery weeks, radiotherapy assumed from each patient's first operation) and the
+        reference is the first scan far enough past that patient's radiotherapy -- see
+        ``rano.criteria.timeline``. Scans BEFORE it are dropped, not merely unscored: they describe
+        an untreated or mid-treatment state, so letting them set the nadir is the same error as
+        using a pre-operative baseline. A patient with no qualifying scan is scored not at all.
     """
     per_patient: dict[str, list[tuple[str, dict[str, float]]]] = defaultdict(list)
     for (patient, tp), vols in volumes.items():
@@ -223,12 +240,24 @@ def build_trajectories(
     for patient, entries in per_patient.items():
         entries.sort(key=lambda e: weeks.sort_key(e[0]))
 
+        record = TreatmentRecord()
+        if surgical is not None:
+            record, _ = treatment_from_labels(
+                surgical.get(patient), [weeks.week_offset(tp) for tp, _ in entries]
+            )
+        courses = record.radiotherapy or ()
+        patient_rt_end = courses[0].end.week if courses and courses[0].end is not None else None
+
         measurements: list[TimepointMeasurement] = []
         for tp, vols in entries:
             row = expert.get((patient, tp))
             if row is not None and row.rating == PRE_OP:
                 continue
             week = weeks.week_offset(tp)
+            if surgical is None:
+                since_rt = (week - rt_end_week) if week is not None and rt_end_week >= 0 else None
+            else:
+                since_rt = (week - patient_rt_end) if week is not None and patient_rt_end is not None else None
             measurements.append(
                 TimepointMeasurement(
                     timepoint=tp,
@@ -239,9 +268,17 @@ def build_trajectories(
                     clinical_deterioration=None,  # not in the dataset
                     steroids_increased=None,      # not in the dataset
                     non_measurable_only=row.non_measurable if row is not None else None,
-                    weeks_since_rt=(week - rt_end_week) if week is not None and rt_end_week >= 0 else None,
+                    weeks_since_rt=since_rt,
                 )
             )
+
+        if surgical is not None:
+            choice = choose_baseline([m.week for m in measurements], record, policy)
+            if not choice.found:
+                out[patient] = (None, [])          # no eligible reference: nothing is scored
+                continue
+            out[patient] = (measurements[choice.index], measurements[choice.index + 1:])
+            continue
 
         reference = None
         for i, m in enumerate(measurements):
@@ -321,6 +358,13 @@ def main() -> int:
     ap.add_argument("--cohort", choices=("all", "practice", "held_out"), default="all")
     ap.add_argument("--profile", action="append", help="repeatable; default = every profile")
     ap.add_argument("--rt-end-week", type=float, default=RT_END_WEEK)
+    ap.add_argument(
+        "--baseline",
+        choices=("post-op-label", "post-rt"),
+        default="post-op-label",
+        help="post-op-label: the expert's first Post-Op study (as built). "
+             "post-rt: the first scan far enough past THIS patient's radiotherapy (RANO 2.0).",
+    )
     ap.add_argument("--timeline-patients", type=int, default=6, help="0 for none, -1 for all")
     ap.add_argument("--cases", type=int, default=0,
                     help="per-patient case tables with both sides' reasoning; 0 for none, -1 for all")
@@ -347,7 +391,8 @@ def main() -> int:
         keep = {p for p, a in arms.items() if a == args.cohort}
         volumes = {k: v for k, v in volumes.items() if k[0] in keep}
 
-    trajectories = build_trajectories(volumes, expert, args.rt_end_week)
+    surgical = read_surgical_labels(str(args.ratings)) if args.baseline == "post-rt" else None
+    trajectories = build_trajectories(volumes, expert, args.rt_end_week, surgical=surgical)
     profiles = [PROFILES[n] for n in (args.profile or list(PROFILES))]
 
     args.out.mkdir(parents=True, exist_ok=True)
@@ -365,7 +410,11 @@ def main() -> int:
     emit(f"volumes         {source_desc}")
     emit(f"timepoints      {len(volumes)} with volumes, {len(rated)} with a scorable expert rating")
     emit(f"patients        {len({p for p, _ in volumes})}   cohort filter: {args.cohort}")
-    emit(f"rt-end-week     {args.rt_end_week:g} (pseudoprogression window anchor; cohort-level assumption)")
+    emit(f"baseline rule   {args.baseline}")
+    if args.baseline == "post-rt":
+        emit("rt-end-week     per patient: first operation + 10 weeks (assumed; LUMIERE ships no RT dates)")
+    else:
+        emit(f"rt-end-week     {args.rt_end_week:g} (pseudoprogression window anchor; cohort-level assumption)")
     missing = sorted(k for k in rated if k not in volumes)
     if missing:
         emit(f"unmatched       {len(missing)} rated timepoints have no volumes, e.g. {missing[:3]}")

@@ -34,6 +34,8 @@ from typing import Iterator, Mapping
 import nibabel as nib
 import numpy as np
 
+from rano.contract.treatment import TreatmentRecord
+
 
 # --------------------------------------------------------------------------------------
 # Vocabulary
@@ -235,6 +237,9 @@ class Patient:
 
     id: str
     timepoints: tuple[Timepoint, ...]
+    # Surgery and radiotherapy dates, on the same week axis as the timepoints. Delivered alongside
+    # the scans, never read from them; the default is "nothing delivered". See treatment.py.
+    treatment: TreatmentRecord = field(default_factory=TreatmentRecord)
 
     def __post_init__(self) -> None:
         known = [tp.week_offset for tp in self.timepoints if tp.week_offset is not None]

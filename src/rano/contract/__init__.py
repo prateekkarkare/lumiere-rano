@@ -11,6 +11,7 @@ from rano.contract.case import (
     SpaceTag,
     Timepoint,
 )
+from rano.contract.treatment import RadiotherapyCourse, TreatmentRecord, TreatmentWeek
 
 __all__ = [
     "Geometry",
@@ -22,4 +23,7 @@ __all__ = [
     "Space",
     "SpaceTag",
     "Timepoint",
+    "RadiotherapyCourse",
+    "TreatmentRecord",
+    "TreatmentWeek",
 ]

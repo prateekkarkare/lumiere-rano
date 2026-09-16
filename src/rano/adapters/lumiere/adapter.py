@@ -13,6 +13,10 @@ Spaces (per the locked per-image-space design):
   * DeepBraTumIA mask, its skull-strip reference image, and brain mask -> MNI 1mm (shared key).
 
 This adapter only DECODES: it wires refs and reads headers as needed. It never transforms pixels.
+
+Treatment history (surgery and radiotherapy weeks) is rebuilt from the rating file's Pre-Op /
+Post-Op labels when ``ratings_csv`` is given, every date declared as an assumption -- see
+``treatment.py``. Without it, patients carry the default "nothing delivered" record.
 """
 
 from __future__ import annotations
@@ -22,6 +26,7 @@ from collections import OrderedDict
 
 from rano.adapters.base import Adapter
 from rano.adapters.lumiere import paths, weeks
+from rano.adapters.lumiere.treatment import read_surgical_labels, treatment_from_labels
 from rano.adapters.lumiere.zip_ref import ZipNiftiRef, ZipSource
 from rano.contract.case import MaskSource, Modality, Patient, Space, Timepoint
 
@@ -49,6 +54,7 @@ class LumiereAdapter(Adapter):
         zip_path: str,
         manifest_csv: str,
         mask_source: MaskSource = MaskSource.DEEPBRATUMIA,
+        ratings_csv: str | None = None,
     ) -> None:
         if mask_source is not MaskSource.DEEPBRATUMIA:
             raise NotImplementedError(
@@ -58,6 +64,8 @@ class LumiereAdapter(Adapter):
         self._mask_source = mask_source
         #: patient -> list of (tp_label, {Modality: present}, {mask_key: present}) in manifest order
         self._manifest = self._read_manifest(manifest_csv)
+        #: patient -> Pre-Op / Post-Op labels; None when no rating file was given
+        self._surgical = read_surgical_labels(ratings_csv) if ratings_csv else None
 
     # ---- manifest ---------------------------------------------------------------------
     @staticmethod
@@ -81,7 +89,22 @@ class LumiereAdapter(Adapter):
             raise KeyError(f"{patient_id!r} not in LUMIERE manifest")
         rows = sorted(self._manifest[patient_id], key=lambda r: weeks.sort_key(r[0]))
         timepoints = tuple(self._build_timepoint(patient_id, tp, mods, masks) for tp, mods, masks in rows)
-        return Patient(id=patient_id, timepoints=timepoints)
+        return Patient(id=patient_id, timepoints=timepoints, treatment=self._treatment(patient_id)[0])
+
+    # ---- treatment history --------------------------------------------------------------
+    def _treatment(self, patient_id: str):
+        if self._surgical is None:
+            return treatment_from_labels(None)
+        scan_weeks = [weeks.week_offset(tp) for tp, _, _ in self._manifest[patient_id]]
+        return treatment_from_labels(self._surgical.get(patient_id), scan_weeks)
+
+    def audit_treatment(self) -> list[dict]:
+        """Patients whose treatment record was left missing because the labels contradict the scans."""
+        return [
+            {"patient": p, "problem": problem}
+            for p in self._manifest
+            if (problem := self._treatment(p)[1]) is not None
+        ]
 
     # ---- timepoint assembly -----------------------------------------------------------
     def _build_timepoint(self, patient: str, tp: str, mods: dict, masks: dict) -> Timepoint:
