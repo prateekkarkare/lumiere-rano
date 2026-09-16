@@ -41,7 +41,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from rano.adapters.lumiere import paths  # noqa: E402
 from rano.adapters.lumiere.zip_ref import ZipSource  # noqa: E402
-from rano.measurement import measure_lesion  # noqa: E402
+from rano.measurement import FLOOR_MM3, components, measure_lesion  # noqa: E402
 
 DEFAULT_ZIP = ROOT / "Imaging-v202211.zip"
 COHORT_LOCK = ROOT / "output" / "cohort" / "cohort_lock.json"
@@ -49,51 +49,10 @@ RATINGS = ROOT / "LUMIERE-ExpertRating-v202211.csv"
 OUT = ROOT / "output" / "measurement" / "vs_expert.json"
 
 ENHANCING = 1
-FLOOR = 20          # locked in docs/lesion_split_decision.html
+FLOOR = FLOOR_MM3   # locked in docs/lesion_split_decision.html; rule lives in rano.measurement.lesions
 MAX_LESIONS = 5     # measuring every speck is pointless; the expert names at most a handful
 
 MEAS = re.compile(r"(\d+(?:\.\d+)?)\s*(?:mm)?\s*[x×X]\s*(\d+(?:\.\d+)?)\s*(?:mm)?")
-FWD26 = tuple((dx, dy, dz) for dx in (0, 1) for dy in (-1, 0, 1) for dz in (-1, 0, 1)
-              if (dx, dy, dz) > (0, 0, 0))
-
-
-def _shift(d: int):
-    if d == 0:
-        return slice(None), slice(None)
-    return (slice(0, -d), slice(d, None)) if d > 0 else (slice(-d, None), slice(0, d))
-
-
-def components(mask: np.ndarray, floor: int = FLOOR) -> list[np.ndarray]:
-    """26-connected lesions above the floor, biggest first. The locked splitting rule."""
-    n = int(mask.sum())
-    if n == 0:
-        return []
-    idx = np.full(mask.shape, -1, np.int64)
-    idx[mask] = np.arange(n)
-    par = list(range(n))
-
-    def find(x: int) -> int:
-        while par[x] != x:
-            par[x] = par[par[x]]
-            x = par[x]
-        return x
-
-    for off in FWD26:
-        sl = [_shift(d) for d in off]
-        a, b = idx[tuple(s[0] for s in sl)], idx[tuple(s[1] for s in sl)]
-        m = (a >= 0) & (b >= 0)
-        for u, v in zip(a[m].tolist(), b[m].tolist()):
-            ru, rv = find(u), find(v)
-            if ru != rv:
-                par[max(ru, rv)] = min(ru, rv)
-
-    roots = np.fromiter((find(i) for i in range(n)), np.int64, n)
-    coords = np.argwhere(mask)
-    groups = [coords[roots == r] for r in np.unique(roots) if (roots == r).sum() >= floor]
-    groups.sort(key=len, reverse=True)
-    return groups
-
-
 #: Within this many mm on BOTH axes, our lesion is taken to be the one the radiologist measured.
 #: There is no ground truth for WHICH lesion they meant -- only their numbers -- so this split is
 #: partly circular: agreement defines "same lesion", and agreement is then reported. The

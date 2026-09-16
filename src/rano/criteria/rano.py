@@ -42,6 +42,7 @@ from rano.criteria.measurement import (
     TimepointMeasurement,
     TrajectoryResult,
 )
+from rano.contract.treatment import TreatmentRecord
 from rano.criteria.profiles import DEFAULT_PROFILE, ResponseCriteria
 
 
@@ -52,6 +53,13 @@ class ReferenceState:
     baseline_mm3: float | None = None
     nadir_mm3: float | None = None
     t2_nadir_mm3: float | None = None
+    baseline_measurable: bool | None = None
+    """Did the reference scan hold a lesion big enough to measure? Gates PR; see the criteria."""
+
+    @classmethod
+    def anchored_on(cls, m: TimepointMeasurement) -> "ReferenceState":
+        """A fresh reference: the trajectory's baseline, or the first scan after an operation."""
+        return cls(m.enhancing_mm3, m.enhancing_mm3, m.t2_flair_mm3, m.measurable_disease)
 
     def advanced_by(self, m: TimepointMeasurement) -> "ReferenceState":
         """The state after folding ``m`` in. Called AFTER ``m`` has been assessed."""
@@ -61,7 +69,7 @@ class ReferenceState:
         t2 = self.t2_nadir_mm3
         if m.t2_flair_mm3 is not None:
             t2 = m.t2_flair_mm3 if t2 is None else min(t2, m.t2_flair_mm3)
-        return ReferenceState(self.baseline_mm3, nadir, t2)
+        return ReferenceState(self.baseline_mm3, nadir, t2, self.baseline_measurable)
 
 
 def _ratio(value: float | None, reference: float | None) -> float | None:
@@ -95,6 +103,8 @@ def _unknowns(
         out.append("steroids")
     if call is Response.PR and criteria.block_pr_when_non_measurable and m.non_measurable_only is None:
         out.append("non_measurable")
+    if call is Response.PR and criteria.require_measurable_baseline and ref.baseline_measurable is None:
+        out.append("baseline_measurable")
     return tuple(out)
 
 
@@ -185,6 +195,14 @@ def assess_timepoint(
         return build(Response.CR, "no enhancing disease", "enhancing")
 
     if vs_baseline is not None and vs_baseline <= criteria.pr_decrease and pr_big_enough:
+        if criteria.require_measurable_baseline and ref.baseline_measurable is False:
+            return build(
+                Response.SD,
+                "response threshold met, but the reference scan held no lesion big enough to "
+                "measure (>= 10 x 10 mm); PR is not available",
+                "reference",
+                provisional_call=Response.PR,
+            )
         if criteria.block_pr_when_non_measurable and m.non_measurable_only is True:
             return build(
                 Response.SD,
@@ -290,6 +308,7 @@ def assess_trajectory(
     criteria: ResponseCriteria = DEFAULT_PROFILE,
     *,
     reference: TimepointMeasurement | None = None,
+    treatment: TreatmentRecord | None = None,
 ) -> TrajectoryResult:
     """Score one patient's whole trajectory, in the order given.
 
@@ -302,16 +321,19 @@ def assess_trajectory(
     immediate post-operative study. Supply it and every entry in ``measurements`` gets scored.
     Omit it and ``measurements[0]`` is consumed as the reference, emitted as ``BASELINE`` and
     left unscored; ``TrajectoryResult.baseline_scored`` records which happened.
+
+    ``treatment`` supplies the surgery weeks. With it (and ``reset_reference_at_surgery``), the
+    first scan after each operation becomes a NEW reference -- emitted as ``BASELINE``, left
+    unscored, and resetting baseline, nadir and the measurable-disease flag together. Without it
+    nothing resets, and the trajectory is scored against one reference throughout, which is the
+    pre-2026-09 behaviour.
     """
     seed = reference if reference is not None else (measurements[0] if measurements else None)
     if seed is None:
         return TrajectoryResult(patient, (), None, None, True)
 
-    ref = ReferenceState(
-        baseline_mm3=seed.enhancing_mm3,
-        nadir_mm3=seed.enhancing_mm3,
-        t2_nadir_mm3=seed.t2_flair_mm3,
-    )
+    ref = ReferenceState.anchored_on(seed)
+    surgery_weeks = tuple(s.week for s in (treatment.surgeries or ())) if treatment else ()
 
     scored = list(measurements) if reference is not None else list(measurements[1:])
     prefix: list[ResponseAssessment] = []
@@ -327,9 +349,38 @@ def assess_trajectory(
         )
 
     assessments: list[ResponseAssessment] = []
+    previous_week = seed.week
     for m in scored:
+        # An operation between the previous scan and this one voids every earlier number: the old
+        # baseline and nadir describe tissue that has since been cut out. This scan is the new
+        # reference, and a reference is never scored.
+        operated = (
+            next(
+                (w for w in surgery_weeks if previous_week is not None and m.week is not None
+                 and previous_week < w <= m.week),
+                None,
+            )
+            if criteria.reset_reference_at_surgery
+            else None
+        )
+        if operated is not None:
+            assessments.append(
+                ResponseAssessment(
+                    timepoint=m.timepoint,
+                    call=Response.BASELINE,
+                    reason=f"reference reset: operation at week {operated:g}",
+                    driver="reference",
+                    enhancing_mm3=m.enhancing_mm3,
+                )
+            )
+            ref = ReferenceState.anchored_on(m)
+            previous_week = m.week
+            continue
+
         assessments.append(assess_timepoint(m, ref, criteria))
         ref = ref.advanced_by(m)
+        if m.week is not None:
+            previous_week = m.week
 
     assessments = _confirm(assessments, scored, criteria)
 

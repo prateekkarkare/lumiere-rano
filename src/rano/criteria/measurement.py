@@ -78,6 +78,12 @@ class TimepointMeasurement:
     """True when the only disease present is below the measurability floor. RANO forbids calling
     PR on non-measurable disease -- unequivocal PD and SD remain available."""
 
+    measurable_disease: bool | None = None
+    """True when at least one lesion on THIS scan clears RANO's target-lesion gate (>= 10 mm in two
+    perpendicular directions; ``rano.measurement.has_measurable_disease``). It matters most on the
+    reference scan: a patient whose baseline held nothing measurable can never be called a partial
+    response, because there was no measurable disease to respond. ``None`` = nobody measured."""
+
     clinical_deterioration: bool | None = None
     """Definite clinical worsening not attributable to other causes. A RANO PD criterion in its
     own right, and one no imaging pipeline can supply."""

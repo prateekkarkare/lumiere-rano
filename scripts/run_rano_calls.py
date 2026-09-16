@@ -41,13 +41,15 @@ import re
 import sys
 import zipfile
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
+
+import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from rano.adapters.lumiere import weeks  # noqa: E402
+from rano.adapters.lumiere import paths, weeks  # noqa: E402
 from rano.adapters.lumiere.treatment import read_surgical_labels, treatment_from_labels  # noqa: E402
 from rano.criteria import (  # noqa: E402
     PROFILES,
@@ -64,7 +66,10 @@ from rano.criteria import (  # noqa: E402
     split_by_group,
 )
 from rano.contract.treatment import TreatmentRecord  # noqa: E402
+from rano.adapters.lumiere.zip_ref import ZipSource  # noqa: E402
 from rano.criteria.timeline import BaselinePolicy, choose_baseline  # noqa: E402
+from rano.labels import LABEL_SCHEMA  # noqa: E402
+from rano.measurement import has_measurable_disease  # noqa: E402
 
 DEFAULT_ZIP = ROOT / "Imaging-v202211.zip"
 DEFAULT_VOLUMES_CSV = ROOT / "output" / "volume_audit" / "volumes.csv"
@@ -82,6 +87,9 @@ SCORABLE_RATINGS = {"CR", "PR", "SD", "PD"}
 #: dataset ships no radiotherapy dates. Override with --rt-end-week, or set it to a negative
 #: number to disable the window without changing the profile.
 RT_END_WEEK = 10.0
+
+#: the enhancing label integer, from the locked schema -- never hardcoded here
+ENHANCING_LABEL = next(k for k, v in LABEL_SCHEMA["DeepBraTumIA"].items() if v == "enhancing")
 
 _JSON_MEMBER = re.compile(r"^Imaging/([^/]+)/([^/]+)/.*measured_volumes_in_mm3\.json$")
 
@@ -207,8 +215,9 @@ def build_trajectories(
     rt_end_week: float,
     *,
     surgical: dict | None = None,
+    baseline_rule: str = "post-op-label",
     policy: BaselinePolicy = BaselinePolicy(),
-) -> dict[str, tuple[TimepointMeasurement | None, list[TimepointMeasurement]]]:
+) -> dict[str, tuple[TimepointMeasurement | None, list[TimepointMeasurement], TreatmentRecord]]:
     """patient -> (reference scan or None, chronological measurements to score).
 
     Pre-operative studies are DROPPED, not merely left unscored: an untreated tumour used as the
@@ -221,11 +230,15 @@ def build_trajectories(
     Timepoints with volumes but no expert row are kept for the same reason: dropping them would
     hide a real nadir and make later progression unreachable.
 
-    TWO WAYS TO PICK THE REFERENCE
-        Default (``surgical is None``): the first study the expert labelled Post-Op, matched by
-        timepoint LABEL, and one cohort-wide ``rt_end_week`` for the pseudoprogression window.
+    The treatment record is rebuilt whenever ``surgical`` is given, whichever baseline rule is in
+    force: the rule needs the surgery weeks to reset the reference at every operation, which is
+    independent of how the FIRST reference was chosen.
 
-        With ``surgical`` (the Pre-Op/Post-Op labels): the patient's own treatment record is
+    TWO WAYS TO PICK THE REFERENCE
+        ``post-op-label``: the first study the expert labelled Post-Op, matched by timepoint LABEL,
+        and one cohort-wide ``rt_end_week`` for the pseudoprogression window.
+
+        ``post-rt``: the patient's own treatment record is
         rebuilt (surgery weeks, radiotherapy assumed from each patient's first operation) and the
         reference is the first scan far enough past that patient's radiotherapy -- see
         ``rano.criteria.timeline``. Scans BEFORE it are dropped, not merely unscored: they describe
@@ -254,10 +267,10 @@ def build_trajectories(
             if row is not None and row.rating == PRE_OP:
                 continue
             week = weeks.week_offset(tp)
-            if surgical is None:
+            if baseline_rule == "post-op-label" or patient_rt_end is None:
                 since_rt = (week - rt_end_week) if week is not None and rt_end_week >= 0 else None
             else:
-                since_rt = (week - patient_rt_end) if week is not None and patient_rt_end is not None else None
+                since_rt = (week - patient_rt_end) if week is not None else None
             measurements.append(
                 TimepointMeasurement(
                     timepoint=tp,
@@ -272,12 +285,12 @@ def build_trajectories(
                 )
             )
 
-        if surgical is not None:
+        if baseline_rule == "post-rt":
             choice = choose_baseline([m.week for m in measurements], record, policy)
             if not choice.found:
-                out[patient] = (None, [])          # no eligible reference: nothing is scored
+                out[patient] = (None, [], record)   # no eligible reference: nothing is scored
                 continue
-            out[patient] = (measurements[choice.index], measurements[choice.index + 1:])
+            out[patient] = (measurements[choice.index], measurements[choice.index + 1:], record)
             continue
 
         reference = None
@@ -286,7 +299,78 @@ def build_trajectories(
             if row is not None and row.rating == POST_OP:
                 reference = measurements.pop(i)
                 break
-        out[patient] = (reference, measurements)
+        out[patient] = (reference, measurements, record)
+    return out
+
+
+# --------------------------------------------------------------------------------------
+# measurable disease, on the scans responses are measured AGAINST
+# --------------------------------------------------------------------------------------
+
+def reference_scans(trajectories) -> list[tuple[str, str]]:
+    """Every scan that serves as a reference: the trajectory baseline, plus the first scan after
+    each operation, which the rule makes a new reference. Only these need the ruler -- measuring
+    all 599 scans would answer a question nobody asks."""
+    wanted: list[tuple[str, str]] = []
+    for patient, (reference, measurements, record) in trajectories.items():
+        if reference is None:
+            continue
+        wanted.append((patient, reference.timepoint))
+        previous = reference.week
+        for m in measurements:
+            if m.week is not None and previous is not None and any(
+                previous < s.week <= m.week for s in (record.surgeries or ())
+            ):
+                wanted.append((patient, m.timepoint))
+            previous = m.week if m.week is not None else previous
+    return wanted
+
+
+def measurable_flags(keys, zip_path: Path, cache: Path) -> dict[tuple[str, str], bool]:
+    """(patient, timepoint) -> does this scan hold a lesion of at least 10 x 10 mm?
+
+    Cached, because it is the only step here that opens masks: about a second per scan, against a
+    tenth of a second for the whole volume table. Delete the cache file to recompute.
+    """
+    known: dict[tuple[str, str], bool] = {}
+    if cache.is_file():
+        known = {
+            (r["patient"], r["timepoint"]): r["measurable"] == "True"
+            for r in csv.DictReader(cache.open())
+        }
+    todo = [k for k in keys if k not in known]
+    if todo and zip_path.is_file():
+        src = ZipSource(str(zip_path))
+        for i, (patient, tp) in enumerate(todo, 1):
+            member = paths.dbt_mask(patient, tp)
+            if not src.exists(member):
+                continue
+            mask = np.asarray(src.open_nifti(member).dataobj) == ENHANCING_LABEL
+            known[(patient, tp)] = has_measurable_disease(mask)
+            if i % 25 == 0:
+                print(f"  ruler: {i}/{len(todo)} reference scans", file=sys.stderr)
+        cache.parent.mkdir(parents=True, exist_ok=True)
+        with cache.open("w", newline="") as fh:
+            w = csv.DictWriter(fh, fieldnames=["patient", "timepoint", "measurable"])
+            w.writeheader()
+            for (patient, tp), flag in sorted(known.items()):
+                w.writerow({"patient": patient, "timepoint": tp, "measurable": flag})
+    return known
+
+
+def apply_measurability(trajectories, flags):
+    """Stamp ``measurable_disease`` on the scans we measured; everything else stays ``None``."""
+    out = {}
+    for patient, (reference, measurements, record) in trajectories.items():
+        def stamped(m):
+            flag = flags.get((patient, m.timepoint))
+            return m if flag is None else replace(m, measurable_disease=flag)
+
+        out[patient] = (
+            stamped(reference) if reference is not None else None,
+            [stamped(m) for m in measurements],
+            record,
+        )
     return out
 
 
@@ -299,8 +383,10 @@ def run_profile(trajectories, expert, arms, criteria: ResponseCriteria):
     pairs: list[CallPair] = []
     rows: list[dict] = []
     for patient in sorted(trajectories):
-        reference, measurements = trajectories[patient]
-        result = assess_trajectory(patient, measurements, criteria, reference=reference)
+        reference, measurements, record = trajectories[patient]
+        result = assess_trajectory(
+            patient, measurements, criteria, reference=reference, treatment=record
+        )
         arm = arms.get(patient, "unassigned")
 
         for a in result.assessments:
@@ -358,6 +444,10 @@ def main() -> int:
     ap.add_argument("--cohort", choices=("all", "practice", "held_out"), default="all")
     ap.add_argument("--profile", action="append", help="repeatable; default = every profile")
     ap.add_argument("--rt-end-week", type=float, default=RT_END_WEEK)
+    ap.add_argument("--no-measurability", action="store_true",
+                    help="skip the ruler pass; the measurable-disease gate then reports unknown")
+    ap.add_argument("--measurability-cache", type=Path,
+                    default=DEFAULT_OUT.parent / "measurement" / "measurable_references.csv")
     ap.add_argument(
         "--baseline",
         choices=("post-op-label", "post-rt"),
@@ -391,8 +481,16 @@ def main() -> int:
         keep = {p for p, a in arms.items() if a == args.cohort}
         volumes = {k: v for k, v in volumes.items() if k[0] in keep}
 
-    surgical = read_surgical_labels(str(args.ratings)) if args.baseline == "post-rt" else None
-    trajectories = build_trajectories(volumes, expert, args.rt_end_week, surgical=surgical)
+    surgical = read_surgical_labels(str(args.ratings)) if args.ratings.is_file() else None
+    trajectories = build_trajectories(
+        volumes, expert, args.rt_end_week, surgical=surgical, baseline_rule=args.baseline
+    )
+    flags = (
+        {}
+        if args.no_measurability
+        else measurable_flags(reference_scans(trajectories), args.zip, args.measurability_cache)
+    )
+    trajectories = apply_measurability(trajectories, flags)
     profiles = [PROFILES[n] for n in (args.profile or list(PROFILES))]
 
     args.out.mkdir(parents=True, exist_ok=True)
@@ -411,6 +509,8 @@ def main() -> int:
     emit(f"timepoints      {len(volumes)} with volumes, {len(rated)} with a scorable expert rating")
     emit(f"patients        {len({p for p, _ in volumes})}   cohort filter: {args.cohort}")
     emit(f"baseline rule   {args.baseline}")
+    emit(f"ruler           {len(flags)} reference scans measured"
+         + ("" if flags else " (the measurable-baseline gate reports unknown)"))
     if args.baseline == "post-rt":
         emit("rt-end-week     per patient: first operation + 10 weeks (assumed; LUMIERE ships no RT dates)")
     else:

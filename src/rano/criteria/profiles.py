@@ -131,7 +131,23 @@ class ResponseCriteria:
     min_absolute_change_mm3: float = 10.0
     """Changes smaller than this in absolute terms never trigger PD or PR, whatever the ratio."""
     block_pr_when_non_measurable: bool = True
-    """RANO forbids PR on non-measurable disease; PD and SD stay available."""
+    """RANO forbids PR on non-measurable disease; PD and SD stay available. This is the test on the
+    scan being assessed; ``require_measurable_baseline`` is the one on the reference."""
+    require_measurable_baseline: bool = True
+    """Wen 2010: a patient whose disease was never measurable cannot be called a partial response --
+    the best available is stable disease. The test belongs on the REFERENCE scan, not on the scan
+    being assessed: a target lesion shrinking below 10 mm is what a real response looks like, so
+    testing the follow-up would refuse exactly the responses the rule exists to find.
+
+    Needs ``TimepointMeasurement.measurable_disease`` on the reference; unknown leaves PR available
+    and says so in ``unknowns``."""
+    reset_reference_at_surgery: bool = True
+    """RANO: an operation resets both reference points. Volumes either side of a surgery describe
+    different tissue -- the old numbers include what was cut out -- so comparing across one is void.
+    Needs the surgery weeks (``assess_trajectory(..., treatment=...)``); without them nothing resets.
+
+    The first scan after an operation becomes the new reference and is not scored, exactly as the
+    trajectory's own baseline is not scored."""
     block_cr_when_steroids_increased: bool = True
 
     def variant(self, name: str, **changes) -> "ResponseCriteria":
@@ -190,6 +206,8 @@ ENHANCING_ONLY = ResponseCriteria(
     pseudoprogression_weeks=None,
     block_pr_when_non_measurable=False,
     block_cr_when_steroids_increased=False,
+    require_measurable_baseline=False,
+    reset_reference_at_surgery=False,
 )
 
 #: Every profile the evaluation runs by default, in reporting order.
