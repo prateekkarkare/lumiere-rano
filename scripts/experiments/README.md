@@ -74,8 +74,7 @@ as aggregate counts; every per-case detail is read after they are filtered out.
 |---|---|---|
 | `pd_called_as_response.py` | 13 scans are expert PD but pipeline CR/PR. Rule bug, or something the rule cannot see? | No rule fix reaches agreement. 2 are a real bug — **PR with no measurable baseline** (the rule never calls the ruler). 3 rest on T2 progression, which fires on **21 of 25** expert CRs. A CR call means enhancing is exactly 0. |
 | `segmenter_miss_figures.py` | Patient-070's doctor measured 12 × 10 mm; the mask says 0. Is the lesion there? | Yes. A nodule at week 44 grows into a 28 × 22 mm ring by week 61, and **both** segmenters report 0 mm³ at week 44. Also draws Patient-090's T2 progression. |
-
-| `baseline_rule_ab.py` | The reference scan is picked by the expert's Post-Op label. What changes if it is picked by RANO 2.0's rule instead — the first scan far enough past that patient's radiotherapy? | The starting point moves for **70 of 74** patients and **70 scans stop being scored**. Of 13 changed calls, 6 were right and became wrong and none improved; agreement 64.7% → 62.9%. Written up in `docs/BASELINE_2026-09-16.md`. |
+| `baseline_rule_ab.py` | The reference scan is picked by the expert's Post-Op label. What changes if it is picked by RANO 2.0's rule instead — the first scan far enough past that patient's radiotherapy — once both rules are scored on the **same** scans? | The new rule scores a strict subset, 271 of 373. On those 271 the old rule agrees with the expert more (64.2% vs 60.9%; where only one rule agrees, 12 to 3) and balanced accuracy is within noise (42.1% vs 44.5%). The earlier 3.9-point drop was the old rule losing 102 scans it did well on. The expert rated from the post-operative scan, so this reference cannot judge the new rule. Written up in `docs/BASELINE_2026-09-16.md`, Part 3. |
 
 ---
 
